@@ -1,0 +1,11 @@
+html {
+    background-color: gray;
+}
+
+canvas {
+    background-color: black;
+    border-style: solid;
+    border-color: aliceblue;
+    border-width: 2px;
+    border-radius: 10px;
+}
