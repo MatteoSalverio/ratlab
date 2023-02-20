@@ -1,6 +1,6 @@
 html {
     height: 100%;
-    background: linear-gradient(to bottom right, aqua, limegreen);
+    background: linear-gradient(to bottom right, #2871fa, #6718cd);
     text-align: center;
     font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 }
@@ -11,4 +11,12 @@ canvas {
     border-color: aliceblue;
     border-width: 2px;
     border-radius: 10px;
+}
+
+h1 {
+    margin-bottom: 0px;
+}
+
+p {
+    margin-top: 2px;
 }
