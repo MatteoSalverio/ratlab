@@ -274,6 +274,43 @@ class backgroundTile {
     }
 }
 
+class npc extends spriteObj {
+    constructor(x, y, w, h, texturePathRight, texturePathLeft, resolutionX, resolutionY, frameCount) {
+        super(x, y, w, h, texturePathRight, resolutionX, resolutionY, frameCount, false);
+        this.texturePathLeft = texturePathLeft;
+        this.texturePathRight = texturePathRight;
+        this.speed = 4;
+        this.dir = 'right';
+    }
+
+    changeDirection() {
+        if (this.dir == 'left') {
+            this.dir = 'right';
+            this.texture.src = this.texturePathRight;
+            this.move(this.dir, this.speed * 2);
+        }
+        else {
+            this.dir = 'left';
+            this.texture.src = this.texturePathLeft;
+            this.move(this.dir, this.speed * 2);
+        }
+    }
+
+    update() {
+        // Updates hitbox position:
+        this.hitBox = {
+            top: this.y + this.hitBoxOffset * 3,
+            bottom: this.y + this.h - this.hitBoxOffset * 2,
+            left: this.x + this.hitBoxOffset,
+            right: this.x + this.w - this.hitBoxOffset * 2
+        }
+        if (this.colliderCheck('left') !== false || this.colliderCheck('right') !== false) {
+            this.changeDirection();
+        }
+        this.move(this.dir, this.speed);
+    }
+}
+
 function sortByY(objects) { // Sorts objects in order of their y position
     const sortedObjects = [...objects];
     sortedObjects.sort((a, b) => a.y - b.y);
@@ -291,8 +328,11 @@ function redraw() {
 
 function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (let i = 0; i < objs.length; i++)
+    for (let i = 0; i < objs.length; i++) {
+        if (objs[i].index == player.index && !player.moving)
+            continue;
         objs[i].animate();
+    }
 }
 
 function createBoxOfTiles(x, y, w, h, tilePath, tileSize, tileResolution) {
@@ -361,14 +401,16 @@ function update(currentTime) {
 requestAnimationFrame(update);
 
 setInterval(function () {
-    if (player.moving)
-        animate();
+    animate();
 }, 100);
 
 // INSTANTIATION:
 
 let player = new spriteObj(500, 300, 96, 96, 'assets/textures/RatRight.png', 32, 32, 4, false);
 player.hitBoxOffset = 10;
+
+let npcTest = new npc(500, 400, 96, 96, 'assets/textures/RatNpcRight.png', 'assets/textures/RatNpcLeft.png', 32, 32, 4);
+npcTest.hitBoxOffset = 10;
 
 let labTable = new spriteObj(200, 600, 44 * 3, 26 * 3, 'assets/textures/labTable.png', 44, 26, 0, false);
 for (let i = 0; i < 3; i++) {
