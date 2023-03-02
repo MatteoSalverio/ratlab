@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Cookie Game</title>
+
+    <style>
+        html {
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+            color: aliceblue;
+            background-color: darkslategray;
+            text-align: center;
+        }
+
+        button {
+            /*background-color: rgb(57, 255, 93);*/
+            background-color: slategray;
+            border-color: aliceblue;
+            border-radius: 10px;
+            border-style: unset;
+            color: black;
+            cursor: pointer;
+        }
+
+        #cookie {
+            width: 200px;
+            height: 200px;
+
+            background-color: limegreen;
+            border-style: solid;
+            border-color: black;
+            border-width: 2px;
+            border-radius: 85px;
+
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+            font-weight: bold;
+            font-size: 32px;
+
+            cursor: pointer;
+        }
+
+        button:hover {
+            filter: brightness(125%);
+        }
+
+        button:active {
+            filter: brightness(110%);
+        }
+
+        .popup {
+            background-color: slateblue;
+            color: black;
+            padding: 5px;
+            border-radius: 10px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: black;
+            position: fixed;
+            width: 1000px;
+            height: 600px;
+            top: 40%;
+            left: 50%;
+            margin-top: -225px;
+            margin-left: -500px;
+            z-index: 9;
+            text-align: left;
+        }
+
+        .exitButton {
+            font-size: 10px;
+            font-weight: bold;
+            padding: 4px;
+            float: right;
+            margin: 10px;
+            width: 20px;
+            background-color: tomato;
+            cursor: pointer;
+        }
+
+        .levelBtn {
+            width: 100px;
+            height: 100px;
+            background-color: darkseagreen;
+            border-style: solid;
+            margin: 20px;
+
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 style="text-decoration: underline; margin: 20px 0px 0px 0px;">Cookie Game</h1>
+    <br><br>
+    <h2 id="pointsDisplay" style="margin: 0px;">0 Cookies</h2>
+    <br><br>
+    <button id="cookie" onclick="clicked()">Cookie</button>
+
+    <div class="popup" id="levelUpgrade" style="display: inline;">
+        <h3 style="font-size: 32px; float: left; margin: 10px 20px; text-decoration: underline;">Level Upgrades</h3>
+        <button class="exitButton" onclick="togglePopup('levelUpgrade')">X</button>
+        <br><br><br>
+        <button class="levelBtn">Level 2 1,000c</button>
+        <button class="levelBtn">Level 3 10,000c</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
