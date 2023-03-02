@@ -203,6 +203,41 @@ class box extends obj {
     }
 }
 
+class backgroundTile {
+    constructor(x, y, w, h, texturePath, resolutionX, resolutionY, frameCount) {
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+        this.texturePath = texturePath;
+        this.texture = new Image(this.resolutionX, this.resolutionY);
+        this.texture.src = this.texturePath;
+        this.resolutionX = resolutionX;
+        this.resolutionY = resolutionY;
+        this.frameCount = frameCount;
+        this.animation = {
+            frame: 1,
+            frameCount: this.frameCount,
+            rate: 1
+        }
+        backgroundObjs.push(this);
+    }
+
+    animate() {
+        this.draw();
+        if (this.animation.frame >= this.animation.frameCount)
+            this.animation.frame = 1;
+        else
+            this.animation.frame++;
+    }
+
+    draw() {
+        let srcRect = { x: this.resolutionX * (this.animation.frame - 1), y: 0, width: this.resolutionX, height: this.resolutionY };
+        let destRect = { x: this.x, y: this.y, width: this.w, height: this.h };
+        ctx.drawImage(this.texture, srcRect.x, srcRect.y, srcRect.width, srcRect.height, this.x - camera.x, this.y - camera.y, destRect.width, destRect.height);
+    }
+}
+
 class spriteObj extends obj {
     constructor(x, y, w, h, texturePath, resolutionX, resolutionY, frameCount, movable = false) {
         super(x, y, w, h, movable);
@@ -222,41 +257,6 @@ class spriteObj extends obj {
             frameCount: this.frameCount,
             rate: 1
         }
-    }
-
-    animate() {
-        this.draw();
-        if (this.animation.frame >= this.animation.frameCount)
-            this.animation.frame = 1;
-        else
-            this.animation.frame++;
-    }
-
-    draw() {
-        let srcRect = { x: this.resolutionX * (this.animation.frame - 1), y: 0, width: this.resolutionX, height: this.resolutionY };
-        let destRect = { x: this.x, y: this.y, width: this.w, height: this.h };
-        ctx.drawImage(this.texture, srcRect.x, srcRect.y, srcRect.width, srcRect.height, this.x - camera.x, this.y - camera.y, destRect.width, destRect.height);
-    }
-}
-
-class backgroundTile {
-    constructor(x, y, w, h, texturePath, resolutionX, resolutionY, frameCount) {
-        this.x = x;
-        this.y = y;
-        this.w = w;
-        this.h = h;
-        this.texturePath = texturePath;
-        this.texture = new Image(this.resolutionX, this.resolutionY);
-        this.texture.src = this.texturePath;
-        this.resolutionX = resolutionX;
-        this.resolutionY = resolutionY;
-        this.frameCount = frameCount;
-        this.animation = {
-            frame: 1,
-            frameCount: this.frameCount,
-            rate: 1
-        }
-        backgroundObjs.push(this);
     }
 
     animate() {
