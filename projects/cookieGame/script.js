@@ -2,6 +2,14 @@ var points = 0;
 var level = 1;
 const pointsDisplay = document.getElementById("pointsDisplay");
 
+const version = 0.0;
+if (localStorage.getItem("version") == null)
+    localStorage.setItem("version", version);
+else if (localStorage.getItem("version") != version) {
+    localStorage.setItem("version", version);
+    resetAll();
+}
+
 if (localStorage.getItem("points") == null)
     localStorage.setItem("points", 0);
 points = localStorage.getItem("points") * 1;
