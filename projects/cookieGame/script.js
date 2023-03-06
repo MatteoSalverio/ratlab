@@ -2,8 +2,32 @@ var points = 0;
 var level = 1;
 const pointsDisplay = document.getElementById("pointsDisplay");
 
-function displayPoints() {
-    let str = points + '';
+if (localStorage.getItem("points") == null)
+    localStorage.setItem("points", 0);
+points = localStorage.getItem("points") * 1;
+
+if (localStorage.getItem("level") == null)
+    localStorage.setItem("level", 1);
+level = localStorage.getItem("level") * 1;
+
+if (localStorage.getItem("speed") == null)
+    localStorage.setItem("speed", 600);
+time = localStorage.getItem("speed") * 1;
+
+function resetAll() {
+    localStorage.setItem("points", 0);
+    localStorage.setItem("level", 1);
+    localStorage.setItem("speed", 600);
+    points = 0;
+    level = 1;
+    time = 600;
+    displayPoints();
+}
+
+displayPoints();
+
+function addCommas(number) {
+    let str = number;
     let revStr = [];
     let newStr = "";
     let finalStr = "";
@@ -18,21 +42,85 @@ function displayPoints() {
     for (let i = newStr.length - 1; i >= 0; i--) {
         finalStr += newStr[i];
     }
-    pointsDisplay.innerHTML = finalStr + " Cookies";
+    return finalStr;
+}
+
+function displayPoints() {
+    pointsDisplay.innerHTML = addCommas(points + '') + " Cookies";
 }
 
 function addPoints(amount) {
     points += amount;
+    localStorage.setItem("points", points);
+    displayPoints();
 }
 
 function clicked() {
-    addPoints(1);
+    addPoints(level * 1);
     displayPoints();
 }
 
-setInterval(function() {
-    addPoints(level);
+var time = 600;
+var clock = 0;
+setInterval(function () {
+    clock++;
+    if (clock % time != 0)
+        return;
+    addPoints(level * 1);
     displayPoints();
-}, 1000);
+}, 1);
 
-displayPoints();
+var priceMultiplier = 4;
+function fillUpgrades() {
+    let btns = document.getElementsByClassName("levelBtn");
+    let upgradeLevel = level + 1;
+    for (let i = 0; i < btns.length; i++) {
+        let price = Math.pow(upgradeLevel, priceMultiplier);
+        btns[i].innerHTML = "Level " + upgradeLevel + " " + addCommas(price + '') + "c";
+        btns[i].id = upgradeLevel;
+        upgradeLevel++;
+        btns[i].addEventListener('click', function (e) {
+            if (points >= Math.pow(e.target.id, priceMultiplier)) {
+                console.log(price)
+                addPoints(-price);
+                displayPoints();
+                levelUp(Math.floor(Math.pow(e.target.id, 1.2)));
+                e.target.style.backgroundColor = "gold";
+                e.target.disabled = true;
+            }
+        })
+    }
+}
+fillUpgrades();
+
+function levelUp(newLevel) {
+    level = newLevel;
+    localStorage.setItem("level", level);
+}
+let speedPrice = updateSpeedPrice();
+function updateSpeedPrice() {
+    let p = Math.floor(Math.pow(level * 100, 3.2) / time)
+    document.getElementById('upgradeSpeed').innerHTML = "Upgrade Speed (" + addCommas(p + '') + "c)";
+    return p;
+}
+updateSpeedPrice();
+function upgradeSpeed() {
+    if (points < speedPrice)
+        return;
+    let newTime = Math.floor(time * 0.7);
+    if (newTime > 0)
+        time = newTime;
+    updateSpeedPrice();
+    localStorage.setItem("speed", time);
+    localStorage.setItem("speedPrice", speedPrice);
+}
+
+function togglePopup(popup) {
+    let popupElement = document.getElementById(popup);
+    if (popupElement.style.display == "none")
+        popupElement.style.display = "inline";
+    else
+        popupElement.style.display = "none";
+}
+
+// DEV:
