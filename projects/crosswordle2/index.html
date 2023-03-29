@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>CrossWordle 2</title>
+    <link rel="icon" href="https://ratlab.one/wp-content/uploads/2022/09/icon.png">
+    <style>
+        html {
+            background-color: lightskyblue;
+            font-family: sans-serif;
+            font-weight: bold;
+            margin: 20px;
+            text-align: center;
+        }
+
+        #mainTable {
+            margin: auto;
+        }
+
+        td {
+            font-size: 35px;
+            padding: 10px;
+            width: 40px;
+            height: 40px;
+            border-style: solid;
+            border-color: black;
+            border-width: 0.1px;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0);
+            cursor: pointer;
+        }
+
+        .blankTile {
+            background-color: aliceblue;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Cross Wordle 2</h1>
+
+    <table id="mainTable" style="display: inline;"></table>
+
+    <div id="wordle" style="display: none; background-color: black;">
+        <table id="wordleTopRow"></table>
+        <table id="wordleTable"></table>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

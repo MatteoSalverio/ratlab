@@ -59,12 +59,11 @@
             border-style: solid;
             border-color: black;
             position: fixed;
-            width: 1000px;
-            height: 600px;
+            width: 90%;
+            height: 60%;
             top: 40%;
             left: 50%;
-            margin-top: -225px;
-            margin-left: -500px;
+            transform: translate(-50%, -40%);
             z-index: 9;
             text-align: left;
         }
@@ -122,6 +121,7 @@
     <br><br><br><br>
     <button id="openShop" onclick="togglePopup('levelUpgrade')">Level Upgrades</button>
     <button id="upgradeSpeed" onclick="upgradeSpeed()">Upgrade Speed</button>
+    <button id="devMenuButton" onclick="togglePopup('devMenu')">Dev Menu</button>
 
     <div class="popup" id="levelUpgrade" style="display: none;">
         <h3 style="font-size: 32px; float: left; margin: 10px 20px; text-decoration: underline;">Level Upgrades</h3>
@@ -163,7 +163,7 @@
         </div>
     </div>
 
-    <div class="popup" id="devMenu" style="display: inline;">
+    <div class="popup" id="devMenu" style="display: none;">
         <h3 style="font-size: 32px; float: left; margin: 10px 20px; text-decoration: underline;">Dev Menu</h3>
         <button class="exitButton" onclick="togglePopup('devMenu')">X</button>
         <br><br><br>

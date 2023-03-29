@@ -1,5 +1,6 @@
 var points = 0;
 var level = 1;
+var speedLevel = 0;
 const pointsDisplay = document.getElementById("pointsDisplay");
 
 const version = 0.0;
@@ -22,13 +23,20 @@ if (localStorage.getItem("speed") == null)
     localStorage.setItem("speed", 600);
 time = localStorage.getItem("speed") * 1;
 
+if (localStorage.getItem("speedLevel") == null)
+    localStorage.setItem("speedLevel", 0);
+speedLevel = localStorage.getItem("speedLevel") * 1;
+
 function resetAll() {
     localStorage.setItem("points", 0);
     localStorage.setItem("level", 1);
     localStorage.setItem("speed", 600);
+    localStorage.setItem("speedLevel", 0);
     points = 0;
     level = 1;
     time = 600;
+    speedLevel = localStorage.getItem("speedLevel") * 1;
+    document.getElementById("upgradeSpeed").innerHTML = "Upgrade Speed: " + addCommas(speeds[speedLevel] + "") + "c";
     displayPoints();
 }
 
@@ -105,22 +113,27 @@ function levelUp(newLevel) {
     level = newLevel;
     localStorage.setItem("level", level);
 }
-let speedPrice = updateSpeedPrice();
-function updateSpeedPrice() {
-    let p = Math.floor(Math.pow(level * 100, 3.2) / time)
-    document.getElementById('upgradeSpeed').innerHTML = "Upgrade Speed (" + addCommas(p + '') + "c)";
-    return p;
-}
-updateSpeedPrice();
+
+var speeds = [
+    512, 2050, 8200, 16000, 52000, 150000, 500000, 1000000, 5000000, 12000000, 25000000
+];
+document.getElementById("upgradeSpeed").innerHTML = "Upgrade Speed: " + addCommas(speeds[speedLevel] + "") + "c";
 function upgradeSpeed() {
-    if (points < speedPrice)
+    if (speedLevel >= speeds.length) {
+        document.getElementById("upgradeSpeed").innerHTML = "Max Speed";
         return;
-    let newTime = Math.floor(time * 0.7);
-    if (newTime > 0)
-        time = newTime;
-    updateSpeedPrice();
+    }
+    if (speeds[speedLevel] > points)
+        return;
+    speedLevel++;
+    time = Math.floor(time * 0.7);
+    addPoints(-speeds[speedLevel - 1])
     localStorage.setItem("speed", time);
-    localStorage.setItem("speedPrice", speedPrice);
+    localStorage.setItem("speedLevel", speedLevel - 1);
+    if (speedLevel < speeds.length)
+        document.getElementById("upgradeSpeed").innerHTML = "Upgrade Speed: " + addCommas(speeds[speedLevel] + "") + "c";
+    else
+        document.getElementById("upgradeSpeed").innerHTML = "Max Speed";
 }
 
 function togglePopup(popup) {
