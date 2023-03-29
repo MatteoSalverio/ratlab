@@ -13,39 +13,66 @@
             text-align: center;
         }
 
-        #mainTable {
-            margin: auto;
-        }
-
         td {
             font-size: 35px;
             padding: 10px;
             width: 40px;
             height: 40px;
             border-style: solid;
-            border-color: black;
-            border-width: 0.1px;
+            border-color: rgba(0, 0, 0, 0.40);
+            border-width: 3px;
             border-radius: 10px;
             background-color: rgba(255, 255, 255, 0);
             cursor: pointer;
         }
 
         .blankTile {
-            background-color: aliceblue;
+            background-color: rgb(185, 185, 185);
+        }
+
+        #wordleTopRow {
+            background-color: rgba(240, 248, 255, 0.568);
+        }
+
+        button {
+            font-size: 24px;
+            padding: 10px;
+            border-style: solid;
+            border-color: rgba(0, 0, 0, 0.40);
+            border-width: 3px;
+            border-radius: 10px;
+            background-color: lightseagreen;
+            cursor: pointer;
+        }
+
+        button:hover {
+            filter: brightness(130%);
         }
     </style>
 </head>
 
 <body>
-    <h1>Cross Wordle 2</h1>
+    <h1>Cross Wordle 2.0</h1>
 
-    <table id="mainTable" style="display: inline;"></table>
+    <table style="margin: auto;">
+        <tbody id="mainTable" style="display: inline;"></tbody>
+    </table>
 
-    <div id="wordle" style="display: none; background-color: black;">
-        <table id="wordleTopRow"></table>
-        <table id="wordleTable"></table>
+    <div id="wordle" style="display: none;">
+        <table style="margin: auto;">
+            <tbody>
+                <tr id="wordleTopRow"></tr>
+            </tbody>
+        </table>
+
+        <table style="margin: auto;">
+            <tbody id="wordleTable"></tbody>
+        </table>
+        <br><br>
+        <button id="closeWordButton" onclick="closeWordleTable()">Close Word</button>
     </div>
 
+    <h3 style="position: absolute; bottom: 10px; left: 10px; margin: 0;">Copyright RatLab 2023</h3>
     <script src="script.js"></script>
 </body>
 

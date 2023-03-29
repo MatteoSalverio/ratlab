@@ -1,6 +1,8 @@
 const mainTable = document.getElementById("mainTable");
 const wordle = document.getElementById("wordle");
 const wordleTable = document.getElementById("wordleTable");
+const red = "rgb(255, 75, 75)", green = "rgb(108, 255, 89)", orange = "rgb(255, 195, 74)";
+var activeWordle = false;
 var dataList = "";
 
 function instantiateTable(size) {
@@ -14,18 +16,19 @@ function instantiateTable(size) {
 
 function getPos(id, index) {
     let initialPos = [dataList.words[id].location[0], dataList.words[id].location[2]];
+    let pos = initialPos;
     if (dataList.words[id].direction == "horizontal")
-        initialPos[1] = index + 1;
+        pos[1] = initialPos[1] * 1 + index * 1;
     else
-        initialPos[0] = index + 1;
-    return initialPos;
+        pos[0] = initialPos[0] * 1 + index * 1;
+    return pos;
 }
 
 function fillTable() {
     for (let i = 0; i < dataList.words.length; i++) {
         for (let j = 0; j < dataList.words[i].word.length; j++) {
             let space = document.getElementById(getPos(i, j)[0] + "," + getPos(i, j)[1]);
-            space.innerHTML = dataList.words[i].word[j];
+            //space.innerHTML = dataList.words[i].word[j];
             space.className += " " + dataList.words[i].id + " ";
             if (space.className.indexOf("blankTile") < 0)
                 space.className += " blankTile ";
@@ -35,6 +38,7 @@ function fillTable() {
                 while (spaceClasses[k] * 1 == NaN)
                     k++
                 highlightWord(spaceClasses[0]);
+                updateColors();
             });
             space.addEventListener("mouseout", event => {
                 let spaceClasses = event.target.classList;
@@ -42,6 +46,15 @@ function fillTable() {
                 while (spaceClasses[k] * 1 == NaN)
                     k++
                 unhighlightWord(spaceClasses[0]);
+                updateColors();
+            });
+            space.addEventListener("click", event => {
+                let spaceClasses = event.target.classList;
+                let k = 0;
+                while (spaceClasses[k] * 1 == NaN)
+                    k++
+                selectWord(spaceClasses[0]);
+                updateColors();
             });
         }
     }
@@ -58,20 +71,56 @@ function getWordSpaces(id) {
 function highlightWord(id) {
     let wordSpaces = getWordSpaces(id);
     for (let i = 0; i < wordSpaces.length; i++)
-        wordSpaces[i].style.backgroundColor = "rgba(200, 255, 255, 0.9)";
+        wordSpaces[i].style.filter = "brightness(130%)";
 }
 
 function unhighlightWord(id) {
     let wordSpaces = getWordSpaces(id);
     for (let i = 0; i < wordSpaces.length; i++)
-        wordSpaces[i].style.backgroundColor = "aliceblue";
+        wordSpaces[i].style.filter = "brightness(100%)";
 }
 
-function selectWord(id) {
+function updateColors() {
+    for (let i = 0; i < dataList.words.length; i++) {
+        if (dataList.words[i].attempts.length <= 0) {
+            /*for (let j = 0; j < dataList.words[i].word.length; j++) {
+                document.getElementById(getPos(i, j)[0] + "," + getPos(i, j)[1]).style.backgroundColor = "aliceblue";
+            }*/
+            continue;
+        }
+        let colors = checkGuess(i, dataList.words[i].attempts[dataList.words[i].attempts.length - 1]);
+        for (let j = 0; j < dataList.words[i].word.length; j++) {
+            document.getElementById(getPos(i, j)[0] + "," + getPos(i, j)[1]).style.backgroundColor = colors[j];
+        }
+    }
+}
 
+function checkGuess(wordId, guess) {
+    let arr = [];
+    for (let i = 0; i < dataList.words[wordId].word.length; i++) {
+        if (guess[i] == dataList.words[wordId].word[i])
+            arr.push(green);
+        else if (dataList.words[wordId].word.indexOf(guess[i]) > -1)
+            arr.push(orange);
+        else
+            arr.push(red);
+    }
+    return arr;
+}
+
+var selectedWordId = null;
+var column = 0;
+
+function selectWord(id) {
+    if (dataList.words[id].word == dataList.words[id].attempts[dataList.words[id].attempts.length - 1])
+        return;
+    selectedWordId = id;
+    showWordleTable(id);
+    column = 0;
 }
 
 function showWordleTable(wordId) {
+    activeWordle = true;
     mainTable.style.display = "none";
     wordle.style.display = "inline";
 
@@ -81,6 +130,101 @@ function showWordleTable(wordId) {
         for (let j = 0; j < dataList.words[wordId].word.length; j++) {
             document.getElementById("wordleTableRow" + i).innerHTML += "<td id='wordleTable[" + i + "," + j + "]'></td";
         }
+    }
+
+    let topRow = document.getElementById("wordleTopRow");
+    topRow.innerHTML = "";
+    for (let i = 0; i < dataList.words[wordId].word.length; i++) {
+        topRow.innerHTML += "<td id='topRow" + i + "'></td>"
+        let currentSpace = document.getElementById(getPos(wordId, i)[0] + "," + getPos(wordId, i)[1]);
+        if (currentSpace.innerHTML == dataList.words[selectedWordId].word[i]) {
+            document.getElementById("topRow" + i).innerHTML = currentSpace.innerHTML;
+            document.getElementById("topRow" + i).style.backgroundColor = green;
+        }
+        else
+            document.getElementById("topRow" + i).innerHTML = " ";
+    }
+
+    let tempAttempts = dataList.words[selectedWordId].attempts;
+    dataList.words[selectedWordId].attempts = [];
+    for (let i = 0; i < tempAttempts.length; i++) {
+        for (let j = 0; j < tempAttempts[i].length; j++) {
+            document.getElementById("wordleTable[" + i + "," + j + "]").innerHTML = tempAttempts[i][j];
+        }
+        wordleGuess(tempAttempts[i]);
+        dataList.words[selectedWordId].attempts.push(tempAttempts[i]);
+    }
+}
+
+function closeWordleTable() {
+    activeWordle = false;
+    mainTable.style.display = "inline";
+    wordle.style.display = "none";
+
+    if (dataList.words[selectedWordId].attempts.length > 0) {
+        for (let i = 0; i < dataList.words[selectedWordId].word.length; i++) {
+            let space = document.getElementById(getPos(selectedWordId, i)[0] + "," + getPos(selectedWordId, i)[1]);
+            let wordleSpace = document.getElementById("wordleTable[" + (dataList.words[selectedWordId].attempts.length - 1) + "," + i + "]");
+            space.innerHTML = wordleSpace.innerHTML
+        }
+    }
+
+    updateColors();
+}
+
+const keys = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "ENTER", "BACKSPACE"];
+document.addEventListener("keydown", function (e) {
+    if (!activeWordle)
+        return;
+    let k = e.key.toUpperCase();
+    if (keys.indexOf(k) < 0)
+        return;
+
+    if (dataList.words[selectedWordId].attempts.length >= dataList.words[selectedWordId].word.length + 1)
+        return;
+
+    processInput(k);
+});
+
+function processInput(k) {
+    if (k == "BACKSPACE") {
+        if (column <= 0)
+            return;
+        column--;
+        document.getElementById("wordleTable[" + dataList.words[selectedWordId].attempts.length + "," + column + "]").innerHTML = "";
+        return;
+    }
+    else if (k == "ENTER") {
+        wordleEnter();
+        return;
+    }
+
+    if (column >= dataList.words[selectedWordId].word.length)
+        return;
+    document.getElementById("wordleTable[" + dataList.words[selectedWordId].attempts.length + "," + column + "]").innerHTML = k;
+    column++;
+}
+
+function wordleEnter() {
+    let guess = "";
+    for (let i = 0; i < dataList.words[selectedWordId].word.length; i++) {
+        let space = document.getElementById("wordleTable[" + dataList.words[selectedWordId].attempts.length + "," + i + "]");
+        guess += space.innerHTML;
+    }
+    if (guess.length < dataList.words[selectedWordId].word.length)
+        return;
+    column = 0;
+    wordleGuess(guess);
+    dataList.words[selectedWordId].attempts.push(guess);
+    if (guess == dataList.words[selectedWordId].word || dataList.words[selectedWordId].attempts.length >= dataList.words[selectedWordId].word.length + 1)
+        closeWordleTable();
+}
+
+function wordleGuess(guess) {
+    let colors = checkGuess(selectedWordId, guess);
+    for (let i = 0; i < dataList.words[selectedWordId].word.length; i++) {
+        let space = document.getElementById("wordleTable[" + dataList.words[selectedWordId].attempts.length + "," + i + "]");
+        space.style.backgroundColor = colors[i];
     }
 }
 
@@ -92,12 +236,19 @@ function onlineStart() { //For if the site is on a server (or VSCode Live Server
             instantiateTable(dataList.size);
             fillTable();
 
-            //showWordleTable(1);
+            /*selectWord(1);
+            processInput("W");
+            processInput("O");
+            processInput("R");
+            processInput("L");
+            processInput("D");
+            processInput("ENTER");*/
+            updateColors();
         })
         .catch(err => {
             //console.clear();
             console.error("Error: Cannot Access Online Puzzles");
-            alert("NOTICE: CrossWordle is meant to be run on an online website. CrossWordle will now run in offline mode")
+            //alert("NOTICE: CrossWordle is meant to be run on an online website. CrossWordle will now run in offline mode")
             //offlineStart();
         });
 }
