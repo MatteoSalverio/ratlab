@@ -1,6 +1,7 @@
 const mainTable = document.getElementById("mainTable");
 const wordle = document.getElementById("wordle");
 const wordleTable = document.getElementById("wordleTable");
+const menu = document.getElementById("menu");
 const red = "rgb(255, 75, 75)", green = "rgb(108, 255, 89)", orange = "rgb(255, 195, 74)";
 var activeWordle = false;
 var dataList = "";
@@ -11,11 +12,13 @@ function instantiateTable(size) {
         for (let j = 0; j < size; j++) {
             document.getElementById("mainTableRow" + i).innerHTML += "<td id='" + i + "," + j + "'> </td>"
         }
+        mainTable.innerHTML += "<br>"
     }
 }
 
 function getPos(id, index) {
-    let initialPos = [dataList.words[id].location[0], dataList.words[id].location[2]];
+    let initialPos = dataList.words[id].location.split(",");
+    console.log(initialPos)
     let pos = initialPos;
     if (dataList.words[id].direction == "horizontal")
         pos[1] = initialPos[1] * 1 + index * 1;
@@ -28,7 +31,7 @@ function fillTable() {
     for (let i = 0; i < dataList.words.length; i++) {
         for (let j = 0; j < dataList.words[i].word.length; j++) {
             let space = document.getElementById(getPos(i, j)[0] + "," + getPos(i, j)[1]);
-            //space.innerHTML = dataList.words[i].word[j];
+            //space.innerHTML = dataList.words[i].word[j]; // Shows all answers if uncommented
             space.className += " " + dataList.words[i].id + " ";
             if (space.className.indexOf("blankTile") < 0)
                 space.className += " blankTile ";
@@ -97,11 +100,28 @@ function updateColors() {
 
 function checkGuess(wordId, guess) {
     let arr = [];
-    for (let i = 0; i < dataList.words[wordId].word.length; i++) {
-        if (guess[i] == dataList.words[wordId].word[i])
+    let word = dataList.words[wordId].word;
+    let letters = [];
+    let lettersFound = [];
+    for (let i = 65; i <= 90; i++) {
+        letters[i] = 0;
+        lettersFound[i] = 0;
+    }
+    for (let i = 0; i < word.length; i++) {
+        letters[word[i].charCodeAt()]++;
+    }
+    for (let i = 0; i < word.length; i++) {
+        if (guess[i] == word[i]) {
+            lettersFound[guess[i].charCodeAt()]++;
             arr.push(green);
-        else if (dataList.words[wordId].word.indexOf(guess[i]) > -1)
-            arr.push(orange);
+        }
+        else if (word.indexOf(guess[i]) > -1) {
+            lettersFound[guess[i].charCodeAt()]++;
+            if (lettersFound[guess[i].charCodeAt()] > letters[guess[i].charCodeAt()])
+                arr.push(red)
+            else
+                arr.push(orange);
+        }
         else
             arr.push(red);
     }
@@ -123,6 +143,7 @@ function showWordleTable(wordId) {
     activeWordle = true;
     mainTable.style.display = "none";
     wordle.style.display = "inline";
+    menu.style.display = "none";
 
     wordleTable.innerHTML = "";
     for (let i = 0; i < dataList.words[wordId].word.length + 1; i++) {
@@ -160,6 +181,7 @@ function closeWordleTable() {
     activeWordle = false;
     mainTable.style.display = "inline";
     wordle.style.display = "none";
+    menu.style.display = "inline";
 
     if (dataList.words[selectedWordId].attempts.length > 0) {
         for (let i = 0; i < dataList.words[selectedWordId].word.length; i++) {
@@ -229,7 +251,7 @@ function wordleGuess(guess) {
 }
 
 function onlineStart() { //For if the site is on a server (or VSCode Live Server)
-    fetch('puzzles/word.json')
+    fetch('puzzles/clothing.json')
         .then(response => response.text())
         .then(data => {
             dataList = JSON.parse(data);
@@ -243,6 +265,7 @@ function onlineStart() { //For if the site is on a server (or VSCode Live Server
             processInput("L");
             processInput("D");
             processInput("ENTER");*/
+
             updateColors();
         })
         .catch(err => {
@@ -251,6 +274,14 @@ function onlineStart() { //For if the site is on a server (or VSCode Live Server
             //alert("NOTICE: CrossWordle is meant to be run on an online website. CrossWordle will now run in offline mode")
             //offlineStart();
         });
+}
+
+function togglePopup(popupName) {
+    let popup = document.getElementById(popupName);
+    if (popup.style.display == 'none')
+        popup.style.display = 'inline';
+    else
+        popup.style.display = 'none';
 }
 
 onlineStart();

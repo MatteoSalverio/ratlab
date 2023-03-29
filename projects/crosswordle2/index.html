@@ -2,57 +2,14 @@
 <html>
 
 <head>
-    <title>CrossWordle 2</title>
+    <title>Cross Wordle 2</title>
     <link rel="icon" href="https://ratlab.one/wp-content/uploads/2022/09/icon.png">
-    <style>
-        html {
-            background-color: lightskyblue;
-            font-family: sans-serif;
-            font-weight: bold;
-            margin: 20px;
-            text-align: center;
-        }
-
-        td {
-            font-size: 35px;
-            padding: 10px;
-            width: 40px;
-            height: 40px;
-            border-style: solid;
-            border-color: rgba(0, 0, 0, 0.40);
-            border-width: 3px;
-            border-radius: 10px;
-            background-color: rgba(255, 255, 255, 0);
-            cursor: pointer;
-        }
-
-        .blankTile {
-            background-color: rgb(185, 185, 185);
-        }
-
-        #wordleTopRow {
-            background-color: rgba(240, 248, 255, 0.568);
-        }
-
-        button {
-            font-size: 24px;
-            padding: 10px;
-            border-style: solid;
-            border-color: rgba(0, 0, 0, 0.40);
-            border-width: 3px;
-            border-radius: 10px;
-            background-color: lightseagreen;
-            cursor: pointer;
-        }
-
-        button:hover {
-            filter: brightness(130%);
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-    <h1>Cross Wordle 2.0</h1>
+    <h1>Cross Wordle</h1>
+    <h2>FBLA Nationals Pre Release 2.1 - <a href="https://discord.gg/bEeh62EGt8">Report bugs here!</a></h2>
 
     <table style="margin: auto;">
         <tbody id="mainTable" style="display: inline;"></tbody>
@@ -70,6 +27,82 @@
         </table>
         <br><br>
         <button id="closeWordButton" onclick="closeWordleTable()">Close Word</button>
+    </div>
+
+    <div class="popup" id="leaderboards" style="display: none;">
+        <h3 style="float: left; margin: 10px 20px; text-decoration: underline;">Leaderboard</h3>
+        <button class="exitButton" onclick="togglePopup('leaderboards')">X</button>
+        <table id="leaderboardsTable">
+            <tr class="tableHeader">
+                <th>Player Name</th>
+                <th>Score</th>
+            </tr>
+            <tr>
+                <td id="player1">Player1</td>
+                <td id="letters1">0 Letters</td>
+            </tr>
+            <tr>
+                <td id="player2">Player2</td>
+                <td id="letters2">0 Letters</td>
+            </tr>
+            <tr>
+                <td id="player3">Player3</td>
+                <td id="letters3">0 Letters</td>
+            </tr>
+            <tr>
+                <td id="player4">Player4</td>
+                <td id="letters4">0 Letters</td>
+            </tr>
+            <tr>
+                <td id="player5">Player5</td>
+                <td id="letters5">0 Letters</td>
+            </tr>
+        </table>
+    </div>
+    <div class="popup" id="howToPlay" style="display: none;">
+        <h3 style="float: left; margin: 10px 20px; text-decoration: underline;">How to Play</h3>
+        <button class="exitButton" onclick="togglePopup('howToPlay')">X</button>
+        <br><br>
+        <div style="text-align: left; margin: 20px;">
+            <li>Click on a <span style="color: aliceblue;">row or column</span> to select the word</li>
+            <li>Make a guess for what the word is</li>
+            <br>
+            <li><span style="color: rgb(108, 255, 89); font-weight: bold;;">Green</span> letters are correct</li>
+            <li><span style="color: rgb(255, 195, 74); font-weight: bold;">Orange</span> letters are in the word,
+                but not where you put
+                them</li>
+            <li><span style="color: rgb(218, 0, 0); font-weight: bold;">Red</span> letters are not in the word</li>
+            <br>
+            <li>Make sure to work on other words when you get stuck!</li>
+        </div>
+    </div>
+    <div class="popup" id="devSettings" style="display: none;">
+        <h3 style="float: left; margin: 10px 20px; text-decoration: underline;">Dev Settings</h3>
+        <button class="exitButton" onclick="togglePopup('devSettings')">X</button>
+        <br><br>
+        <div style="text-align: left; margin: 20px;">
+            <!--<li class="devButton" onclick="loadNewPuzzle(prompt('Enter data:'))">Load Puzzle</li>-->
+            <li class="devButton" onclick="resetLeaderboard()">Reset Leaderboard</li>
+            <li class="devButton" onclick="autocomplete()">Autocomplete</li>
+        </div>
+    </div>
+    <div class="popup" id="createEdit" style="display: none;">
+        <h3 style="float: left; margin: 10px 20px; text-decoration: underline;">Create / Edit</h3>
+        <button class="exitButton" onclick="togglePopup('createEdit')">X</button>
+        <br><br>
+        <div style="text-align: left; margin: 20px;">
+            <a href="https://ratlab.one/projects/crosswordles/editor/" style="-webkit-text-stroke-width: 0px;">
+                <li class="devButton">Create Puzzle</li>
+            </a>
+            <li class="devButton" onclick="loadNewPuzzle(prompt('Enter data:'))">Load Puzzle</li>
+        </div>
+    </div>
+
+    <div id="menu" class="menu" style="display: auto;">
+        <button onclick="finish()" style="display: none;">Finish</button>
+        <button onclick="togglePopup('howToPlay')" style="background-color: lightseagreen;">How to Play</button>
+        <button onclick="togglePopup('leaderboards')" style="display: none;">Leaderboards</button>
+        <button id="devButton" onclick="togglePopup('devSettings')" style="display: none;">Dev</button>
     </div>
 
     <h3 style="position: absolute; bottom: 10px; left: 10px; margin: 0;">Copyright RatLab 2023</h3>
