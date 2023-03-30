@@ -6,6 +6,8 @@ const red = "rgb(255, 75, 75)", green = "rgb(108, 255, 89)", orange = "rgb(255, 
 var activeWordle = false;
 var dataList = "";
 
+const puzzleFile = document.getElementById("puzzleFile");
+
 function instantiateTable(size) {
     for (let i = 0; i < size; i++) {
         mainTable.innerHTML += "<tr id='mainTableRow" + i + "'></tr>"
@@ -18,7 +20,6 @@ function instantiateTable(size) {
 
 function getPos(id, index) {
     let initialPos = dataList.words[id].location.split(",");
-    console.log(initialPos)
     let pos = initialPos;
     if (dataList.words[id].direction == "horizontal")
         pos[1] = initialPos[1] * 1 + index * 1;
@@ -256,9 +257,7 @@ function onlineStart() { //For if the site is on a server (or VSCode Live Server
         .then(response => response.text())
         .then(data => {
             dataList = JSON.parse(data);
-            instantiateTable(dataList.size);
-            fillTable();
-            updateColors();
+            loadNewPuzzle();
         })
         .catch(err => {
             console.clear();
@@ -269,9 +268,7 @@ function onlineStart() { //For if the site is on a server (or VSCode Live Server
 }
 function offlineStart() {
     dataList = JSON.parse('{"size": 11,"words": [{"id": 0,"location": "1,3","direction": "horizontal","word": "JACKET","attempts": []},{"id": 1,"location": "1,3","direction": "vertical","word": "JEANS","attempts": []},{"id": 2,"location": "3,1","direction": "horizontal","word": "FLANNEL","attempts": []},{"id": 3,"location": "5,3","direction": "horizontal","word": "SHOES","attempts": []},{"id": 4,"location": "5,7","direction": "vertical","word": "SHIRT","attempts": []},{"id": 5,"location": "6,7","direction": "horizontal","word": "HAT","attempts": []},{"id": 6,"location": "4,9","direction": "vertical","word": "PANTS","attempts": []}]}');
-    instantiateTable(dataList.size);
-    fillTable();
-    updateColors();
+    loadNewPuzzle();
 }
 
 function togglePopup(popupName) {
@@ -283,3 +280,41 @@ function togglePopup(popupName) {
 }
 
 onlineStart();
+
+// DEV:
+puzzleFile.addEventListener("change", function (e) {
+    var reader = new FileReader();
+    reader.onload = onReaderLoad;
+    reader.readAsText(e.target.files[0]);
+});
+function onReaderLoad(event) {
+    try {
+        var obj = JSON.parse(event.target.result);
+        dataList = obj;
+        loadNewPuzzle();
+    }
+    catch {
+        alert("ERROR: The file you have uploaded is not a Cross Wordle Puzzle!");
+    }
+}
+function loadNewPuzzle() {
+    try {
+        mainTable.innerHTML = "";
+        instantiateTable(dataList.size);
+        fillTable();
+        updateColors();
+    }
+    catch {
+        console.error("Error loading new puzzle")
+    }
+}
+
+function autocomplete() {
+    for (let i = 0; i < dataList.words.length; i++) {
+        selectWord(dataList.words[i].id);
+        for(let j = 0; j < dataList.words[i].word.length; j++) {
+            processInput(dataList.words[i].word[j]);
+        }
+        wordleEnter();
+    }
+}

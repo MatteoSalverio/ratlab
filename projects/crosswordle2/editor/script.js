@@ -10,6 +10,7 @@ const sizeInput = document.getElementById("size");
 const locationInput = document.getElementById("location");
 const wordInput = document.getElementById("word");
 const directionInput = document.getElementById("direction");
+const puzzleFile = document.getElementById("puzzleFile");
 
 directionInput.addEventListener("click", function () {
     if (directionInput.innerHTML == "Horizontal")
@@ -54,31 +55,19 @@ function addWord() {
         space.innerHTML = word[i];
         space.style.backgroundColor = "aliceblue"
     }
-    words.push(
-        [
-            ["id", words.length],
-            ["location", locationInput.value],
-            ["direction", directionInput.innerHTML.toLowerCase()],
-            ["word", word],
-            ["attempts", []]
-        ]
-    );
-    console.log(words)
+    let wordObj = {
+        "id": dataList.words.length,
+        "location": locationInput.value,
+        "direction": directionInput.innerHTML.toLowerCase(),
+        "word": word,
+        "attempts": []
+    };
+    dataList.words.push(wordObj);
+    console.log(dataList);
 }
 
 function save() {
-    data = '{"size":' + sizeInput.value + ', "words": [';
-    for (let i = 0; i < words.length; i++) {
-        data += "{";
-        for (let j = 0; j < 4; j++)
-            data += '"' + words[i][j][0] + '": ' + '"' + words[i][j][1] + '",';
-        data += '"' + words[i][4][0] + '": ' + "[]";
-        data += "}";
-        if (i < words.length - 1)
-            data += ",";
-    }
-    data += ']}';
-    console.log(data)
+    data = JSON.stringify(dataList);
     downloadToFile(data, "CrossWordlePuzzle.json", "text/plain")
 }
 
@@ -100,3 +89,103 @@ function togglePopup(popupName) {
     else
         popup.style.display = 'none';
 }
+
+function wordleGetPos(id, index) {
+    let initialPos = dataList.words[id].location.split(",");
+    let pos = initialPos;
+    if (dataList.words[id].direction == "horizontal")
+        pos[1] = initialPos[1] * 1 + index * 1;
+    else
+        pos[0] = initialPos[0] * 1 + index * 1;
+    return pos;
+}
+function fillTable() {
+    for (let i = 0; i < dataList.words.length; i++) {
+        for (let j = 0; j < dataList.words[i].word.length; j++) {
+            let space = document.getElementById(wordleGetPos(dataList.words[i].id, j)[0] + "," + wordleGetPos(dataList.words[i].id, j)[1]);
+            space.innerHTML = dataList.words[i].word[j];
+            space.className += " " + dataList.words[i].id + " ";
+            space.style.backgroundColor = "aliceblue";
+
+            space.addEventListener("mouseover", event => {
+                let spaceClasses = event.target.classList;
+                let k = 0;
+                while (spaceClasses[k] * 1 == NaN)
+                    k++
+                highlightWord(spaceClasses[0]);
+                updateColors();
+            });
+            space.addEventListener("mouseout", event => {
+                let spaceClasses = event.target.classList;
+                let k = 0;
+                while (spaceClasses[k] * 1 == NaN)
+                    k++
+                unhighlightWord(spaceClasses[0]);
+                updateColors();
+            });
+        }
+    }
+}
+
+puzzleFile.addEventListener("change", function (e) {
+    var reader = new FileReader();
+    reader.onload = onReaderLoad;
+    reader.readAsText(e.target.files[0]);
+});
+function onReaderLoad(event) {
+    try {
+        var obj = JSON.parse(event.target.result);
+        dataList = obj;
+        loadNewPuzzle();
+    }
+    catch {
+        alert("ERROR: The file you have uploaded is not a Cross Wordle Puzzle!");
+    }
+}
+function loadNewPuzzle() {
+    try {
+        mainTable.innerHTML = "";
+        instantiateTable(dataList.size);
+        fillTable();
+        console.log(dataList)
+    }
+    catch {
+        console.error("Error loading puzzle")
+    }
+}
+
+function highlightWord(id) {
+    let wordSpaces = getWordSpaces(id);
+    for (let i = 0; i < wordSpaces.length; i++)
+        wordSpaces[i].style.filter = "brightness(200%)";
+}
+
+function unhighlightWord(id) {
+    let wordSpaces = getWordSpaces(id);
+    for (let i = 0; i < wordSpaces.length; i++)
+        wordSpaces[i].style.filter = "brightness(100%)";
+}
+
+function getWordSpaces(id) {
+    let arr = []
+    for (let i = 0; i < dataList.words[id].word.length; i++) {
+        arr.push(document.getElementById(getPos(id, i)[0] + "," + getPos(id, i)[1]));
+    }
+    return arr;
+}
+
+function onlineStart() { //For if the site is on a server (or VSCode Live Server)
+    fetch('template.json')
+        .then(response => response.text())
+        .then(data => {
+            dataList = JSON.parse(data);
+        })
+        .catch(err => {
+            console.clear();
+            console.error("Error: Cannot Access Online Puzzles");
+            alert("NOTICE: CrossWordle Editor is meant to be run on an online website. CrossWordle Editor will now run in offline mode")
+            offlineStart();
+        });
+}
+
+onlineStart();

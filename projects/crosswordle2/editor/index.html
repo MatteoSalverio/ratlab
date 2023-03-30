@@ -11,7 +11,7 @@
             position: absolute;
             left: 30px;
             top: 30px;
-            background-color: slategray;
+            background-color: darkslateblue;
             padding: 20px;
             border-style: solid;
             border-color: black;
@@ -27,7 +27,8 @@
         }
 
         td:hover {
-            filter: brightness(200%);
+            filter: brightness(120%);
+            border-color: darkslateblue;
         }
 
         p {
@@ -45,10 +46,16 @@
             filter: brightness(110%);
         }
 
-        .popup {
-            top: 30%;
+        #addWord {
+            top: 27%;
             right: 10%;
             transform: translate(200%);
+        }
+
+        #removeWord {
+            top: 25%;
+            right: 10%;
+            transform: translate(200%, 110%);
         }
     </style>
 </head>
@@ -61,13 +68,14 @@
         <tbody id="mainTable" style="display: inline;"></tbody>
     </table>
 
+    <br>
+    <p>Location:</p>
+    <input type="text" id="location" name="location" placeholder="Location" value="0,0">
+
     <div class="popup" id="addWord" style="display: inline;">
         <h3 style="float: left; margin: 10px 20px; text-decoration: underline;">Add Word</h3>
         <button class="exitButton" onclick="togglePopup('addWord')">X</button>
-        <br><br>
         <div style="text-align: left; margin: 20px;">
-            <p>Location:</p>
-            <input type="text" id="location" name="location" placeholder="Location" value="0,0">
             <br><br>
             <p>Word:</p>
             <input type="text" id="word" name="word" placeholder="Word" value="">
@@ -75,6 +83,17 @@
             <p>Direction (Click):</p>
             <p id="direction">Horizontal</p>
             <button onclick="addWord()" style="position: absolute; bottom: 15px; left: 25px; font-size: 16px;">Add
+                Word</button>
+        </div>
+    </div>
+    <div class="popup" id="removeWord" style="display: inline;">
+        <h3 style="float: left; margin: 10px 20px; text-decoration: underline;">Remove Word</h3>
+        <button class="exitButton" onclick="togglePopup('removeWord')">X</button>
+        <br><br>
+        <div style="text-align: left; margin: 20px;">
+            <p>To remove a word, click on a letter of that word, and it will highlight the entire word. Then click
+                "Remove Word" below to remove it</p>
+            <button onclick="removeWord()" style="position: absolute; bottom: 15px; left: 25px; font-size: 16px;">Remove
                 Word</button>
         </div>
     </div>
@@ -89,9 +108,23 @@
         </div>
     </div>
 
+    <div class="popup" id="loadPuzzle" style="display: none;">
+        <h3 style="float: left; margin: 10px 20px; text-decoration: underline;">Load Puzzle</h3>
+        <button class="exitButton" onclick="togglePopup('loadPuzzle')">X</button>
+        <br><br>
+        <div style="text-align: left; margin: 20px;">
+            <p style="margin-bottom: 3px;">Input JSON File Here:</p>
+            <input type="file" id="puzzleFile"></input>
+        </div>
+    </div>
+
     <div id="menu" class="menu">
-        <h1>Menu</h1>
+        <h1 style="margin-top: 0px; margin-bottom: 10px;">Menu</h1>
+        <button onclick="togglePopup('loadPuzzle')">Load Puzzle</button>
+        <!--<br>
         <button onclick="togglePopup('addWord')">Add Word</button>
+        <br>
+        <button onclick="togglePopup('removeWord')">Remove Word</button>-->
         <br>
         <button onclick="togglePopup('settings')">Settings</button>
         <br>
