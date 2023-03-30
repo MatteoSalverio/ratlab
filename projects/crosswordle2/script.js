@@ -250,30 +250,28 @@ function wordleGuess(guess) {
     }
 }
 
+const puzzleName = 'clothing';
 function onlineStart() { //For if the site is on a server (or VSCode Live Server)
-    fetch('puzzles/clothing.json')
+    fetch('puzzles/' + puzzleName + '.json')
         .then(response => response.text())
         .then(data => {
             dataList = JSON.parse(data);
             instantiateTable(dataList.size);
             fillTable();
-
-            /*selectWord(1);
-            processInput("W");
-            processInput("O");
-            processInput("R");
-            processInput("L");
-            processInput("D");
-            processInput("ENTER");*/
-
             updateColors();
         })
         .catch(err => {
-            //console.clear();
+            console.clear();
             console.error("Error: Cannot Access Online Puzzles");
-            //alert("NOTICE: CrossWordle is meant to be run on an online website. CrossWordle will now run in offline mode")
-            //offlineStart();
+            alert("NOTICE: CrossWordle is meant to be run on an online website. CrossWordle will now run in offline mode")
+            offlineStart();
         });
+}
+function offlineStart() {
+    dataList = JSON.parse('{"size": 11,"words": [{"id": 0,"location": "1,3","direction": "horizontal","word": "JACKET","attempts": []},{"id": 1,"location": "1,3","direction": "vertical","word": "JEANS","attempts": []},{"id": 2,"location": "3,1","direction": "horizontal","word": "FLANNEL","attempts": []},{"id": 3,"location": "5,3","direction": "horizontal","word": "SHOES","attempts": []},{"id": 4,"location": "5,7","direction": "vertical","word": "SHIRT","attempts": []},{"id": 5,"location": "6,7","direction": "horizontal","word": "HAT","attempts": []},{"id": 6,"location": "4,9","direction": "vertical","word": "PANTS","attempts": []}]}');
+    instantiateTable(dataList.size);
+    fillTable();
+    updateColors();
 }
 
 function togglePopup(popupName) {

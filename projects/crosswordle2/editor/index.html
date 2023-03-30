@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>CrossWordle Editor</title>
+    <link rel="icon" href="https://ratlab.one/wp-content/uploads/2022/09/icon.png">
+    <link rel="stylesheet" href="../styles.css">
+
+    <style>
+        .menu {
+            position: absolute;
+            left: 30px;
+            top: 30px;
+            background-color: slategray;
+            padding: 20px;
+            border-style: solid;
+            border-color: black;
+            border-width: 5px;
+            border-radius: 20px;
+        }
+
+        input {
+            font-size: 16px;
+            border-style: none;
+            border-radius: 5px;
+            padding: 5px;
+        }
+
+        td:hover {
+            filter: brightness(200%);
+        }
+
+        p {
+            margin: 2px;
+        }
+
+        #direction {
+            cursor: pointer;
+            background-color: slateblue;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        #direction:hover {
+            filter: brightness(110%);
+        }
+
+        .popup {
+            top: 30%;
+            right: 10%;
+            transform: translate(200%);
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Cross Wordle Editor</h1>
+    <h2>FBLA Nationals Pre Release 2.1 - <a href="https://discord.gg/bEeh62EGt8">Report bugs here!</a></h2>
+
+    <table style="margin: auto;">
+        <tbody id="mainTable" style="display: inline;"></tbody>
+    </table>
+
+    <div class="popup" id="addWord" style="display: inline;">
+        <h3 style="float: left; margin: 10px 20px; text-decoration: underline;">Add Word</h3>
+        <button class="exitButton" onclick="togglePopup('addWord')">X</button>
+        <br><br>
+        <div style="text-align: left; margin: 20px;">
+            <p>Location:</p>
+            <input type="text" id="location" name="location" placeholder="Location" value="0,0">
+            <br><br>
+            <p>Word:</p>
+            <input type="text" id="word" name="word" placeholder="Word" value="">
+            <br><br>
+            <p>Direction (Click):</p>
+            <p id="direction">Horizontal</p>
+            <button onclick="addWord()" style="position: absolute; bottom: 15px; left: 25px; font-size: 16px;">Add
+                Word</button>
+        </div>
+    </div>
+
+    <div class="popup" id="settings" style="display: none;">
+        <h3 style="float: left; margin: 10px 20px; text-decoration: underline;">Settings</h3>
+        <button class="exitButton" onclick="togglePopup('settings')">X</button>
+        <br><br>
+        <div style="text-align: left; margin: 20px;">
+            <p>Puzzle Size:</p>
+            <input type="number" id="size" name="size" placeholder="Puzzle Size" value="10">
+        </div>
+    </div>
+
+    <div id="menu" class="menu">
+        <h1>Menu</h1>
+        <button onclick="togglePopup('addWord')">Add Word</button>
+        <br>
+        <button onclick="togglePopup('settings')">Settings</button>
+        <br>
+        <button onclick="save()">Save</button>
+    </div>
+
+    <h3 style="position: absolute; bottom: 10px; left: 10px; margin: 0;">Copyright RatLab 2023</h3>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

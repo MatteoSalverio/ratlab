@@ -1,5 +1,6 @@
 html {
-    background-color: lightskyblue;
+    background-color: darkslategray;
+    color: aliceblue;
     font-family: sans-serif;
     font-weight: bold;
     margin: 0px;
@@ -34,7 +35,8 @@ td {
     border-color: rgba(0, 0, 0, 0.40);
     border-width: 3px;
     border-radius: 10px;
-    background-color: rgba(255, 255, 255, 0);
+    color: black;
+    background-color: rgba(255, 255, 255, 0.1);
     cursor: pointer;
 }
 
@@ -62,7 +64,7 @@ button:hover {
 }
 
 .popup {
-    background: linear-gradient(to top left, rgb(0, 119, 255), rgb(167, 22, 230));
+    background: darkslateblue;
     padding: 5px;
     border-radius: 10px;
     border-width: 5px;
