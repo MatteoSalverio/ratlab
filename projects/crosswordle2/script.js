@@ -250,7 +250,7 @@ function wordleGuess(guess) {
     }
 }
 
-const puzzleName = 'clothing';
+const puzzleName = 'recreation';
 function onlineStart() { //For if the site is on a server (or VSCode Live Server)
     fetch('puzzles/' + puzzleName + '.json')
         .then(response => response.text())
