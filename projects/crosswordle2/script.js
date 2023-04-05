@@ -85,16 +85,27 @@ function unhighlightWord(id) {
 }
 
 function updateColors() {
-    for (let i = 0; i < dataList.words.length; i++) {
-        if (dataList.words[i].attempts.length <= 0) {
-            /*for (let j = 0; j < dataList.words[i].word.length; j++) {
-                document.getElementById(getPos(i, j)[0] + "," + getPos(i, j)[1]).style.backgroundColor = "aliceblue";
-            }*/
+    // Uses the array of attempts
+    /*for (let i = 0; i < dataList.words.length; i++) {
+        if (dataList.words[i].attempts.length <= 0)
             continue;
-        }
         let colors = checkGuess(i, dataList.words[i].attempts[dataList.words[i].attempts.length - 1]);
         for (let j = 0; j < dataList.words[i].word.length; j++) {
             document.getElementById(getPos(i, j)[0] + "," + getPos(i, j)[1]).style.backgroundColor = colors[j];
+        }
+    }*/
+
+    // Uses the board
+    for (let i = 0; i < dataList.words.length; i++) {
+        if (dataList.words[i].attempts.length <= 0)
+            continue;
+        let word = "";
+        for (let j = 0; j < dataList.words[i].word.length; j++) {
+            word += document.getElementById(getPos(dataList.words[i].id, j)[0] + "," + getPos(dataList.words[i].id, j)[1]).innerHTML;
+        }
+        let colors = checkGuess(dataList.words[i].id, word);
+        for (let j = 0; j < dataList.words[i].word.length; j++) {
+            document.getElementById(getPos(dataList.words[i].id, j)[0] + "," + getPos(dataList.words[i].id, j)[1]).style.backgroundColor = colors[j];
         }
     }
 }
@@ -312,7 +323,7 @@ function loadNewPuzzle() {
 function autocomplete() {
     for (let i = 0; i < dataList.words.length; i++) {
         selectWord(dataList.words[i].id);
-        for(let j = 0; j < dataList.words[i].word.length; j++) {
+        for (let j = 0; j < dataList.words[i].word.length; j++) {
             processInput(dataList.words[i].word[j]);
         }
         wordleEnter();
