@@ -200,3 +200,16 @@ button:hover {
         display: none;
     }
 }
+
+.key {
+    background-color: lightgray;
+    width: 60px;
+    height: 70px;
+    font-size: 18px;
+    font-weight: bold;
+    margin: 1px;
+}
+
+.specialKey {
+    width: 90px;
+}

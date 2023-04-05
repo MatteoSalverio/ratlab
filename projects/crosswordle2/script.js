@@ -2,6 +2,7 @@ const mainTable = document.getElementById("mainTable");
 const wordle = document.getElementById("wordle");
 const wordleTable = document.getElementById("wordleTable");
 const menu = document.getElementById("menu");
+const keyboard = document.getElementById("keyboard");
 const red = "rgb(255, 75, 75)", green = "rgb(108, 255, 89)", orange = "rgb(255, 195, 74)";
 var activeWordle = false;
 var dataList = "";
@@ -15,6 +16,53 @@ function instantiateTable(size) {
             document.getElementById("mainTableRow" + i).innerHTML += "<td id='" + i + "," + j + "'> </td>"
         }
         mainTable.innerHTML += "<br>"
+    }
+}
+
+function instantiateKeyboard() {
+    keyboard.innerHTML = "";
+    let keys = "QWERTYUIOPASDFGHJKL1ZXCVBNM2";
+    let index = 0;
+    let lengths = [10, 9, 9];
+    for (let i = 0; i < lengths.length; i++) {
+        for (let j = 0; j < lengths[i]; j++) {
+            let keyText = keys[index];
+            let className = "key";
+            if (keys[index] == 1) {
+                keyText = "BKSP";
+                className += " specialKey";
+            }
+            else if (keys[index] == 2) {
+                keyText = "ENTER";
+                className += " specialKey";
+            }
+            keyboard.innerHTML += "<button id='key" + keyText + "' class='" + className + "'>" + keyText + "</button>";
+            index++;
+        }
+        keyboard.innerHTML += "<br>";
+    }
+    let keyButtons = document.getElementsByClassName("key");
+    for (let i = 0; i < keyButtons.length; i++) {
+        keyButtons[i].addEventListener("mousedown", event => {
+            let k = event.target.id.replace("key", "");
+            if (k == "BKSP")
+                k = "BACKSPACE";
+            processInput(k);
+        });
+    }
+}
+function resetKeyboard() {
+    let keyButtons = document.getElementsByClassName("key");
+    for (let i = 0; i < keyButtons.length; i++) {
+        keyButtons[i].style.backgroundColor = "lightgray";
+    }
+}
+
+function shrink() { // Will shrink all wordle table spaces to fit the screen when the word is larger
+    let spaces = document.getElementsByClassName("wordleTableSpaces");
+    console.log(spaces)
+    for (let i = 0; i < spaces; i++) {
+        console.log(spaces[i]);
     }
 }
 
@@ -157,11 +205,17 @@ function showWordleTable(wordId) {
     wordle.style.display = "inline";
     menu.style.display = "none";
 
+    resetKeyboard();
+
+    if (dataList.words[wordId].word.length + 1 > 7) {
+        shrink();
+    }
+
     wordleTable.innerHTML = "";
     for (let i = 0; i < dataList.words[wordId].word.length + 1; i++) {
         wordleTable.innerHTML += "<tr id='wordleTableRow" + i + "'></tr>"
         for (let j = 0; j < dataList.words[wordId].word.length; j++) {
-            document.getElementById("wordleTableRow" + i).innerHTML += "<td id='wordleTable[" + i + "," + j + "]'></td";
+            document.getElementById("wordleTableRow" + i).innerHTML += "<td id='wordleTable[" + i + "," + j + "]' class='wordleTableSpace'></td";
         }
     }
 
@@ -270,6 +324,7 @@ function wordleGuess(guess) {
     for (let i = 0; i < dataList.words[selectedWordId].word.length; i++) {
         let space = document.getElementById("wordleTable[" + dataList.words[selectedWordId].attempts.length + "," + i + "]");
         space.style.backgroundColor = colors[i];
+        document.getElementById("key" + space.innerHTML).style.backgroundColor = colors[i];
     }
 }
 
@@ -324,6 +379,7 @@ function loadNewPuzzle() {
         mainTable.innerHTML = "";
         instantiateTable(dataList.size);
         fillTable();
+        instantiateKeyboard();
         updateColors();
     }
     catch {

@@ -9,7 +9,7 @@
 
 <body>
     <h1>Cross Wordle</h1>
-    <h2>FBLA Nationals Pre Release 2.4 - <a href="https://discord.gg/bEeh62EGt8">Report bugs here!</a></h2>
+    <h2>FBLA Nationals Pre Release 2.5 - <a href="https://discord.gg/bEeh62EGt8">Report bugs here!</a></h2>
 
     <table style="margin: auto;">
         <tbody id="mainTable" style="display: inline;"></tbody>
@@ -25,6 +25,10 @@
         <table style="margin: auto;">
             <tbody id="wordleTable"></tbody>
         </table>
+        <br>
+        <div id="keyboard" class="keyboard">
+
+        </div>
         <br><br>
         <button id="closeWordButton" onclick="closeWordleTable()">Close Word</button>
     </div>
@@ -84,7 +88,7 @@
             <!--<li class="devButton" onclick="loadNewPuzzle(prompt('Enter data:'))">Load Puzzle</li>-->
             <p style="margin-bottom: 3px;">Load New Puzzle:</p>
             <input type="file" id="puzzleFile"></input>
-            <li class="devButton" onclick="autocomplete()">Autocomplete</li>
+            <li class="devButton" onclick="autocomplete()" style="text-decoration: line-through;">Autocomplete</li>
         </div>
     </div>
     <div class="popup" id="createEdit" style="display: none;">
