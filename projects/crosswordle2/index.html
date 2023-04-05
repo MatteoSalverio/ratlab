@@ -2,14 +2,14 @@
 <html>
 
 <head>
-    <title>Cross Wordle 2</title>
+    <title>Cross Wordle</title>
     <link rel="icon" href="https://ratlab.one/wp-content/uploads/2022/09/icon.png">
     <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
     <h1>Cross Wordle</h1>
-    <h2>FBLA Nationals Pre Release 2.3 - <a href="https://discord.gg/bEeh62EGt8">Report bugs here!</a></h2>
+    <h2>FBLA Nationals Pre Release 2.4 - <a href="https://discord.gg/bEeh62EGt8">Report bugs here!</a></h2>
 
     <table style="margin: auto;">
         <tbody id="mainTable" style="display: inline;"></tbody>
@@ -106,7 +106,13 @@
         <button id="devButton" onclick="togglePopup('devSettings')" style="display: inline;">Dev</button>
     </div>
 
-    <h3 style="position: absolute; bottom: 10px; left: 10px; margin: 0;">Copyright RatLab 2023</h3>
+    <div class="popup alert" id="notWordAlert" style="display: none;">
+        <h2 style="margin-top: 12px; color: aliceblue;">Not a word!</h2>
+    </div>
+
+    <h3 style="position: absolute; bottom: 10px; left: 10px; margin: 0;"><a href="https://ratlab.one">RatLab
+            2023</a></h3>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
     <script src="script.js"></script>
 </body>
 

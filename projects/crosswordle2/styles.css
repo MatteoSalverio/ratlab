@@ -23,7 +23,11 @@ h2 {
 
 a {
     text-decoration: none;
-    color: tomato;
+    color: greenyellow;
+}
+
+a:hover {
+    filter: brightness(120%);
 }
 
 td {
@@ -165,4 +169,34 @@ button:hover {
     border-width: 1px;
     padding: 2px;
     font-size: 18px;
+}
+
+.alert {
+    width: 200px;
+    height: 50px;
+    top: 40%;
+    left: 50%;
+    margin-top: -300px;
+    margin-left: -100px;
+    padding: 5px;
+    animation: alert 3s ease-in;
+    filter: opacity(0%);
+}
+
+@keyframes alert {
+    0% {
+        filter: opacity(0%);
+    }
+
+    10% {
+        filter: opacity(100%);
+    }
+
+    80% {
+        filter: opacity(0%);
+    }
+
+    100% {
+        display: none;
+    }
 }

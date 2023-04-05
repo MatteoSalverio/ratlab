@@ -226,6 +226,7 @@ function processInput(k) {
             return;
         column--;
         document.getElementById("wordleTable[" + dataList.words[selectedWordId].attempts.length + "," + column + "]").innerHTML = "";
+        document.getElementById('notWordAlert').style.display = 'none';
         return;
     }
     else if (k == "ENTER") {
@@ -247,11 +248,21 @@ function wordleEnter() {
     }
     if (guess.length < dataList.words[selectedWordId].word.length)
         return;
-    column = 0;
-    wordleGuess(guess);
-    dataList.words[selectedWordId].attempts.push(guess);
-    if (guess == dataList.words[selectedWordId].word || dataList.words[selectedWordId].attempts.length >= dataList.words[selectedWordId].word.length + 1)
-        closeWordleTable();
+
+    const url = "https://api.wordnik.com/v4/word.json/" + guess.toLowerCase() + "/definitions?limit=200&includeRelated=false&useCanonical=false&includeTags=false&api_key=a2a73e7b926c924fad7001ca3111acd55af2ffabf50eb4ae5";
+    $.ajax({
+        type: "GET",
+        url: url
+    }).done(function () { //If word exists
+        column = 0;
+        wordleGuess(guess);
+        dataList.words[selectedWordId].attempts.push(guess);
+        if (guess == dataList.words[selectedWordId].word || dataList.words[selectedWordId].attempts.length >= dataList.words[selectedWordId].word.length + 1)
+            closeWordleTable();
+    }).fail(function () { //If word does not exist
+        togglePopup("notWordAlert");
+        console.log("Not a word!");
+    });
 }
 
 function wordleGuess(guess) {
