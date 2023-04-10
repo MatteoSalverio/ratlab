@@ -3,6 +3,7 @@ const wordle = document.getElementById("wordle");
 const wordleTable = document.getElementById("wordleTable");
 const menu = document.getElementById("menu");
 const keyboard = document.getElementById("keyboard");
+const scoreDisplay = document.getElementById("score");
 const red = "rgb(255, 75, 75)", green = "rgb(108, 255, 89)", orange = "rgb(255, 195, 74)";
 var activeWordle = false;
 var dataList = "";
@@ -134,17 +135,17 @@ function unhighlightWord(id) {
 
 function updateColors() {
     // Uses the array of attempts
-    /*for (let i = 0; i < dataList.words.length; i++) {
+    for (let i = 0; i < dataList.words.length; i++) {
         if (dataList.words[i].attempts.length <= 0)
             continue;
         let colors = checkGuess(i, dataList.words[i].attempts[dataList.words[i].attempts.length - 1]);
         for (let j = 0; j < dataList.words[i].word.length; j++) {
             document.getElementById(getPos(i, j)[0] + "," + getPos(i, j)[1]).style.backgroundColor = colors[j];
         }
-    }*/
+    }
 
-    // Uses the board
-    for (let i = 0; i < dataList.words.length; i++) {
+    let points = 0;
+    /*for (let i = 0; i < dataList.words.length; i++) {
         if (dataList.words[i].attempts.length <= 0)
             continue;
         let word = "";
@@ -155,7 +156,14 @@ function updateColors() {
         for (let j = 0; j < dataList.words[i].word.length; j++) {
             document.getElementById(getPos(dataList.words[i].id, j)[0] + "," + getPos(dataList.words[i].id, j)[1]).style.backgroundColor = colors[j];
         }
-    }
+        for (let j = 0; j < colors.length; j++) {
+            if (colors[j] == green)
+                points += 5;
+            else if (colors[j] == orange)
+                points += 1;
+        }
+    }*/
+    scoreDisplay.innerHTML = "Score: " + points;
 }
 
 function checkGuess(wordId, guess) {
@@ -315,7 +323,6 @@ function wordleEnter() {
             closeWordleTable();
     }).fail(function () { //If word does not exist
         togglePopup("notWordAlert");
-        console.log("Not a word!");
     });
 }
 
@@ -380,6 +387,13 @@ function loadNewPuzzle() {
         instantiateTable(dataList.size);
         fillTable();
         instantiateKeyboard();
+
+        for (let i = 0; i < dataList.words.length; i++) {
+            for (let j = 0; j < dataList.words[i].length; j++) {
+                document.getElementById(getPos(dataList.words))
+            }
+        }
+
         updateColors();
     }
     catch {
@@ -396,3 +410,19 @@ function autocomplete() {
         wordleEnter();
     }
 }
+
+function saveGame() {
+    data = JSON.stringify(dataList);
+    downloadToFile(data, "CrossWordleSave.json", "text/plain")
+}
+
+const downloadToFile = (content, filename, contentType) => {
+    const a = document.createElement('a');
+    const file = new Blob([content], { type: contentType });
+
+    a.href = URL.createObjectURL(file);
+    a.download = filename;
+    a.click();
+
+    URL.revokeObjectURL(a.href);
+};

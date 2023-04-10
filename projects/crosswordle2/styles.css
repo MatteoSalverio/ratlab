@@ -183,6 +183,10 @@ button:hover {
     filter: opacity(0%);
 }
 
+.alert h2 {
+    font-size: 24px;
+}
+
 @keyframes alert {
     0% {
         filter: opacity(0%);
@@ -212,4 +216,20 @@ button:hover {
 
 .specialKey {
     width: 90px;
+}
+
+input::file-selector-button {
+    font-size: 14px;
+    padding: 5px 12px;
+    margin-left: 0px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.40);
+    border-width: 2px;
+    border-radius: 10px;
+    background-color: lightseagreen;
+    cursor: pointer;
+}
+
+input::file-selector-button:hover {
+    filter: brightness(130%);
 }

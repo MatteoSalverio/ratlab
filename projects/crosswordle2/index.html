@@ -9,7 +9,7 @@
 
 <body>
     <h1>Cross Wordle</h1>
-    <h2>FBLA Nationals Pre Release 2.5 - <a href="https://discord.gg/bEeh62EGt8">Report bugs here!</a></h2>
+    <h2>FBLA Nationals Pre Release 2.6<!-- - <a href="https://discord.gg/bEeh62EGt8">Report bugs here!</a>--></h2>
 
     <table style="margin: auto;">
         <tbody id="mainTable" style="display: inline;"></tbody>
@@ -85,9 +85,8 @@
         <button class="exitButton" onclick="togglePopup('devSettings')">X</button>
         <br><br>
         <div style="text-align: left; margin: 20px;">
-            <!--<li class="devButton" onclick="loadNewPuzzle(prompt('Enter data:'))">Load Puzzle</li>-->
-            <p style="margin-bottom: 3px;">Load New Puzzle:</p>
-            <input type="file" id="puzzleFile"></input>
+            <!--<p style="margin-bottom: 3px;">Load New Puzzle:</p>
+            <input type="file" id="puzzleFile"></input>-->
             <li class="devButton" onclick="autocomplete()" style="text-decoration: line-through;">Autocomplete</li>
         </div>
     </div>
@@ -96,10 +95,12 @@
         <button class="exitButton" onclick="togglePopup('createEdit')">X</button>
         <br><br>
         <div style="text-align: left; margin: 20px;">
-            <a href="https://ratlab.one/projects/crosswordles/editor/" style="-webkit-text-stroke-width: 0px;">
-                <li class="devButton">Create Puzzle</li>
-            </a>
-            <li class="devButton" onclick="loadNewPuzzle(prompt('Enter data:'))">Load Puzzle</li>
+            <a href="../crosswordle2/editor/" style="-webkit-text-stroke-width: 0px;" class="devButton">Create
+                Puzzle</a>
+            <div style="text-align: left; margin: 0px;">
+                <p style="margin-bottom: 3px;">Load New Puzzle:</p>
+                <input type="file" id="puzzleFile"></input>
+            </div>
         </div>
     </div>
 
@@ -107,15 +108,18 @@
         <button onclick="finish()" style="display: none;">Finish</button>
         <button onclick="togglePopup('howToPlay')" style="background-color: lightseagreen;">How to Play</button>
         <button onclick="togglePopup('leaderboards')" style="display: inline;">Leaderboards</button>
-        <button id="devButton" onclick="togglePopup('devSettings')" style="display: inline;">Dev</button>
+        <button id="devButton" onclick="saveGame()" style="display: inline;">Save Game</button>
+        <button id="devButton" onclick="togglePopup('createEdit')" style="display: inline;">Create / Edit</button>
+        <button id="devButton" onclick="togglePopup('devSettings')" style="display: inline;">Dev Menu</button>
     </div>
 
     <div class="popup alert" id="notWordAlert" style="display: none;">
         <h2 style="margin-top: 12px; color: aliceblue;">Not a word!</h2>
     </div>
 
-    <h3 style="position: absolute; bottom: 10px; left: 10px; margin: 0;"><a href="https://ratlab.one">RatLab
-            2023</a></h3>
+    <h3 id="score" style="position: absolute; top: 20px; left: 20px; margin: 0; font-size: 32px;">Score: 0</h3>
+    <h3 style="position: absolute; bottom: 10px; left: 10px; margin: 0;"><a href="https://ratlab.one">Matteo Salverio -
+            FBLA 2023</a></h3>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
     <script src="script.js"></script>
 </body>
