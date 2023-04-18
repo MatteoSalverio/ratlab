@@ -189,8 +189,10 @@ document.addEventListener("keydown", function (e) {
         if (currentWord >= words.length - 1)
             return;
         let newPos = getElementsByWordId(currentWord + 1)[0].id * 1
-        for (let i = pos; i < newPos; i++)
+        for (let i = pos; i < newPos; i++) {
+            incorrectKeyStrokes++;
             colorLetter(i, colors.red);
+        }
         pos = newPos;
         highlightLetter(pos, colors.whiteHighlight);
     }
