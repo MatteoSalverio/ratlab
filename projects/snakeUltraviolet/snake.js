@@ -93,7 +93,7 @@ class player extends square {
         super(x, y, color);
         this.dir = 'right';
         this.speed = 1;
-        this.length = 5;
+        this.length = 1;
         this.parts = [];
         this.type = 'player';
         this.controls = {
