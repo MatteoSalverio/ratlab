@@ -9,13 +9,15 @@
     }
 
     canvas {
-        background-color: rgba(33, 0, 47, 0.22);
+        background-color: rgba(33, 0, 47, 0);
         text-align: center;
         margin-right: auto;
         margin-left: auto;
         border: solid 2px darkviolet;
         border-radius: 10px;
         padding: 3px;
+        width: 40%;
+        cursor: pointer;
     }
 
     h2 {
@@ -69,8 +71,8 @@
         padding: 20px;
         border: solid 2px darkviolet;
         border-radius: 10px;
-        width: 350px;
-        height: 695px;
+        width: 20%;
+        height: 80%;
         /*display: none;*/
     }
 
@@ -101,7 +103,8 @@
     }
 
     #output {
-        height: 620px;
+        height: 90%;
+        margin: 0;
         overflow: scroll;
         margin: 10px;
         border: none 1px rgb(175, 120, 199);
@@ -109,15 +112,19 @@
         padding: 10px;
     }
 
+    #output p {
+        margin: 8px;
+    }
+
     .popup {
         position: absolute;
-        width: 50%;
-        height: 55%;
+        width: 30%;
+        height: 75%;
         top: 50%;
         left: 50%;
-        transform: translate(-50%, -55%);
-        background-color: rgba(148, 0, 211, 0.5);
-        border: solid 2px lime;
+        transform: translate(-50%, -50%);
+        background-color: rgba(33, 0, 48, 0.95);
+        border: solid 2px darkviolet;
         border-radius: 10px;
         padding: 20px;
     }
@@ -146,13 +153,24 @@
         filter: brightness(150%);
     }
 
-    #colorPicker {
+    select {
         font-size: 16px;
         padding: 5px;
         background-color: rgba(148, 0, 211, 0.1);
         color: aliceblue;
         border: solid 2px darkviolet;
         border-radius: 10px;
+        cursor: pointer;
+    }
+
+    option {
+        background-color: rgb(81, 0, 116);
+        cursor: pointer;
+    }
+
+    .checkbox {
+        cursor: pointer;
+        background-color: darkviolet;
     }
 </style>
 
@@ -176,27 +194,41 @@
         <button class="exitButton" onclick="togglePopup('menu')">X</button>
         <h2>Menu</h2>
         <br>
+        <button id="pauseButton" onclick="togglePause()">Unpause</button>
+        <br><br>
         <button onclick="togglePopup('addPlayer')">Add Player</button>
+        <br><br>
+        <button onclick="togglePopup('gamemodes')">Gamemodes</button>
     </div>
     <div id="log" class="panel" style="top: 65px; right: 10px;">
         <button class="exitButton" onclick="togglePopup('log')">X</button>
         <h2>Game Log</h2>
         <div id="output"></div>
     </div>
-    <div class="popup" id="addPlayer" style="display: none;">
+    <div class="popup" id="addPlayer" style="display: inline;">
         <button class="exitButton" onclick="togglePopup('addPlayer')">X</button>
         <h2 style="text-decoration: underline;">Add Player</h2>
         <br>
         <h3 style="margin-bottom: 5px;">Choose a Color:</h3>
         <select name="colorPicker" id="colorPicker">
+            <option>Lime</option>
             <option>Red</option>
             <option>Orange</option>
             <option>Yellow</option>
             <option>Green</option>
-            <option>Blue</option>
-            <option>Violet</option>
+            <option>Aqua</option>
+            <option>Dark Violet</option>
         </select>
-        <br><br><br>
+        <br>
+        <h3 style="margin-bottom: 5px;">Controls -<span style="font-weight: normal;"> Click to set or choose a
+                preset:</span></h3>
+        <select name="controlsPreset" id="controlsPreset">
+            <option>Select Preset</option>
+            <option>WASD</option>
+            <option>IJKL</option>
+            <option>Arrow Keys</option>
+        </select>
+        <br><br>
         <div class="dpadDiv">
             <button class="dpad" id="up"></button>
             <br>
@@ -208,6 +240,14 @@
         </div>
         <br><br>
         <button onclick="addNewPlayer()">Join Game</button>
+    </div>
+    <div class="popup" id="gamemodes" style="display: none;">
+        <button class="exitButton" onclick="togglePopup('gamemodes')">X</button>
+        <h2 style="text-decoration: underline;">Gamemodes</h2>
+        <br>
+        <h3 style="display: inline;">Breakout</h3>
+        <input type="checkbox" id="breakoutGamemode" class="checkbox" style="display: inline;">
+        <button onclick="applyGamemodes()" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);">Apply</button>
     </div>
     <script src="snake.js"></script>
 </body>
