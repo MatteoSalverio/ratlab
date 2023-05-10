@@ -1,6 +1,7 @@
 html {
     height: 100%;
-    background: linear-gradient(to bottom right, #2871fa, #6718cd);
+    color: aliceblue;
+    background: linear-gradient(to bottom right, rgb(45, 67, 67), rgb(11, 113, 113));
     text-align: center;
     font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 }

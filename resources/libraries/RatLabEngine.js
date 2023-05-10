@@ -1,68 +1,82 @@
-// Rat Lab Rewritten - Copyright Rat Lab 2023
+// Rat Lab Engine - Copyright Rat Lab 2023
 // First Version of the Rat Lab Engine
 
-const canvas = document.getElementById("canvas");
+const canvas = document.getElementById("canvas"); // Canvas where game is displayed
 const ctx = canvas.getContext("2d");
 
-function setWindowSize() {
+function setWindowSize() { // Sets the size of the canvas to take up most of the screen
     let w = window.innerWidth,
         h = window.innerHeight;
     canvas.width = w * 0.8;
     canvas.height = h * 0.85;
 }
 setWindowSize();
-
 window.addEventListener('resize', setWindowSize());
 
-ctx.imageSmoothingEnabled = false;
+ctx.imageSmoothingEnabled = false; // Allows the game to be pixelated using nearest neighbor scaling
 
 var objs = []; // All objects in the scene are contained here
 var backgroundObjs = []; // All background objects, always drawn first
 
-const world = {
+const world = { // The physics world
     friction: 0.01, // Determines how fast things will lose force
     gravity: 0
 }
 
 var playerSpeed = 300;
 
-var camera = {
+var camera = { // Changes where and how game objects are displayed, it is the "perspective" of the game
     x: 0,
-    y: 0
+    y: 0,
+    offset: {
+        x: 0,
+        y: 0
+    }
 }
 
 class obj { // General class, mainly for inheritance
     constructor(x, y, w, h, mass, movable = false) {
-        this.x = x;
-        this.y = y;
-        this.w = w;
-        this.h = h;
-        this.mass = mass;
+        this.x = x; // Object's position on the x-axis
+        this.y = y; // Object's position on the y-axis
+        this.w = w; // Width of object
+        this.h = h; // height of object
+        this.mass = mass; // mass of object, used for physics calculations
 
-        this.hitBoxOffset = 0;
-        this.hitBox = {
+        this.hitBoxOffset = 0; // Determines the size of the hitbox relative to the object's texture
+        this.hitBox = { // creates a box boundary around the object
             top: this.y + this.hitBoxOffset,
             bottom: this.y + this.h - this.hitBoxOffset * 2,
             left: this.x + this.hitBoxOffset,
             right: this.x + this.w - this.hitBoxOffset * 2
         }
 
-        this.movable = movable;
+        this.movable = movable; // Enables or disables physics for the object
 
-        this.forces = {
+        this.forces = { // Stored forces on the object
             horizontal: 0,
             vertical: 0
         }
 
         this.index = objs.length;
-        objs.push(this);
+        objs.push(this); // Adds this object to the list of all game objects
+    }
+
+    updateHitBox() {
+        // Updates hitbox position:
+        this.hitBox = {
+            top: this.y + this.hitBoxOffset * 3,
+            bottom: this.y + this.h - this.hitBoxOffset * 2,
+            left: this.x + this.hitBoxOffset,
+            right: this.x + this.w - this.hitBoxOffset * 2
+        }
     }
 
     physicsUpdate() {
         // Gravitational Acceleration
-        if (this.colliderCheck('down') && this.forces.vertical > 0)
-            this.forces.vertical = 0;
-        else if (!this.colliderCheck('down') && this.movable)
+        if (this.colliderCheck('down') && this.forces.vertical > 0) { // Resets gravity when object touches the ground
+            this.forces.vertical *= -0.2;
+        }
+        else if (!this.colliderCheck('down') && (this.movable || this.index == player.index) && this.forces.vertical < 10)
             this.forces.vertical += world.gravity;
 
         // Apply Horizontal Forces
@@ -88,17 +102,10 @@ class obj { // General class, mainly for inheritance
         // Round the forces
         this.forces.horizontal = Math.round(this.forces.horizontal * 100) / 100
         this.forces.vertical = Math.round(this.forces.vertical * 100) / 100
+        this.updateHitBox();
     }
 
-    update() {
-        // Updates hitbox position:
-        this.hitBox = {
-            top: this.y + this.hitBoxOffset * 3,
-            bottom: this.y + this.h - this.hitBoxOffset * 2,
-            left: this.x + this.hitBoxOffset,
-            right: this.x + this.w - this.hitBoxOffset * 2
-        }
-    }
+    update() { }
 
     draw() { }
 
@@ -145,7 +152,8 @@ class obj { // General class, mainly for inheritance
             }
             else {
                 objs[this.colliderCheck('up')].applyForce('vertical', -strength); // Applies a pushing force to the interacting object
-                this.applyForce('vertical', strength * 0.8); // Applies a force back on the main object
+                if (this.movable)
+                    this.applyForce('vertical', strength * 0.8); // Applies a force back on the main object
             }
         }
         else if (dir == 'down') {
@@ -154,7 +162,8 @@ class obj { // General class, mainly for inheritance
             }
             else {
                 objs[this.colliderCheck('down')].applyForce('vertical', strength);
-                this.applyForce('vertical', -strength * 0.8);
+                if (this.movable)
+                    this.applyForce('vertical', -strength * 0.8);
             }
         }
         else if (dir == 'right') {
@@ -163,7 +172,8 @@ class obj { // General class, mainly for inheritance
             }
             else {
                 objs[this.colliderCheck('right')].applyForce('horizontal', strength);
-                this.applyForce('horizontal', -strength * 0.8);
+                if (this.movable)
+                    this.applyForce('horizontal', -strength * 0.8);
             }
         }
         else if (dir == 'left') {
@@ -172,14 +182,15 @@ class obj { // General class, mainly for inheritance
             }
             else {
                 objs[this.colliderCheck('left')].applyForce('horizontal', -strength);
-                this.applyForce('horizontal', strength * 0.8);
+                if (this.movable)
+                    this.applyForce('horizontal', strength * 0.8);
             }
         }
     }
 
-    applyForce(axis, magnitude) {
+    applyForce(axis, magnitude) { // Applies a force to the object obeying the physics world's ruleset
         magnitude *= 1;
-        if (!this.movable)
+        if (!this.movable && this.index != player.index)
             return;
         if (axis == 'horizontal')
             this.forces.horizontal += magnitude;
@@ -190,7 +201,7 @@ class obj { // General class, mainly for inheritance
     }
 }
 
-class box extends obj {
+class box extends obj { // Simple box object
     constructor(x, y, w, h, mass, color, movable = false) {
         super(x, y, w, h, mass, movable);
         this.color = color;
@@ -213,7 +224,7 @@ class box extends obj {
     }
 }
 
-class backgroundTile {
+class backgroundTile { // Tiles that are rendered behind everything else and have no collision
     constructor(x, y, w, h, texturePath, resolutionX, resolutionY, frameCount) {
         this.x = x;
         this.y = y;
@@ -251,25 +262,25 @@ class backgroundTile {
 class spriteObj extends obj {
     constructor(x, y, w, h, mass, texturePath, resolutionX, resolutionY, frameCount, movable = true) {
         super(x, y, w, h, mass, movable);
-        this.texturePath = texturePath;
-        this.resolutionX = resolutionX;
-        this.resolutionY = resolutionY;
+        this.texturePath = texturePath; // Location of texture
+        this.resolutionX = resolutionX; // Width in pixels of the texture
+        this.resolutionY = resolutionY; // Height in pixels of the texture
         this.texture = new Image(this.resolutionX, this.resolutionY);
         this.texture.src = this.texturePath;
-        this.frameCount = frameCount;
-        this.dir = 'right';
+        this.frameCount = frameCount; // Amount of frames in the animation
+        this.dir = 'right'; // Direction that the object is facing
         this.moving = false;
 
         this.hitBoxOffset = 0;
 
-        this.animation = {
+        this.animation = { // Details about the animation state of the object
             frame: 1,
             frameCount: this.frameCount,
             rate: 1
         }
     }
 
-    animate() {
+    animate() { // Draws the object and progresses the animation by 1 frame
         this.draw();
         if (this.animation.frame >= this.animation.frameCount)
             this.animation.frame = 1;
@@ -284,7 +295,7 @@ class spriteObj extends obj {
     }
 }
 
-class npc extends spriteObj {
+class npc extends spriteObj { // Simple textured object that walks back and fourth
     constructor(x, y, w, h, mass, texturePathRight, texturePathLeft, resolutionX, resolutionY, frameCount) {
         super(x, y, w, h, mass, texturePathRight, resolutionX, resolutionY, frameCount, false);
         this.texturePathLeft = texturePathLeft;
@@ -321,6 +332,36 @@ class npc extends spriteObj {
     }
 }
 
+let keys = []; // Array of all keys that have been pressed
+document.addEventListener('keydown', function (e) {
+    let k = e.keyCode;
+    keys[k] = true; // Sets the key to active in the array
+    if (keys[87] || keys[65] || keys[83] || keys[68]) // WASD Causes the player to move
+        player.moving = true;
+});
+document.addEventListener('keyup', function (e) {
+    let k = e.keyCode;
+    keys[k] = false;
+    player.moving = false; // Sets the key to inactive in the array
+    if (keys[87] || keys[65] || keys[83] || keys[68]) // WASD Causes the player to move
+        player.moving = true;
+    else { // Resets player's animation
+        player.moving = false;
+        player.animation.frame = 1;
+    }
+});
+function getKey(key) { // Returns the value of a specific key from the keys array
+    if (key == "Space")
+        return keys[32];
+    else if (key == "Backspace")
+        return keys[8];
+    else if (key == "Shift")
+        return keys[16];
+    else if (key == "Enter")
+        return keys[13];
+    return keys[key.charCodeAt(0)];
+}
+
 function sortByY(objects) { // Sorts objects in order of their y position
     const sortedObjects = [...objects];
     sortedObjects.sort((a, b) => a.y - b.y);
@@ -328,7 +369,7 @@ function sortByY(objects) { // Sorts objects in order of their y position
 }
 
 function redraw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clears all objects from the canvas
     for (let i = 0; i < backgroundObjs.length; i++) // Draws all objects in the background
         backgroundObjs[i].draw();
     let sorted = sortByY(objs); // Allows objects to be drawn in order of their y position to create a 3d effect
@@ -337,7 +378,7 @@ function redraw() {
 }
 
 function animate() { // Plays animations for all objects
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clears all objects from the canvas
     for (let i = 0; i < objs.length; i++) {
         if (objs[i].index == player.index && !player.moving)
             continue;
@@ -345,7 +386,7 @@ function animate() { // Plays animations for all objects
     }
 }
 
-function createBoxOfTiles(x, y, w, h, mass, tilePath, tileSize, tileResolution) {
+function createBoxOfTiles(x, y, w, h, mass, tilePath, tileSize, tileResolution) { // Creates a box of spriteObj tiles
     let xLength = Math.floor(w / tileSize);
     let yLength = Math.floor(h / tileSize);
     for (let i = 0; i < xLength; i++) {
@@ -355,87 +396,31 @@ function createBoxOfTiles(x, y, w, h, mass, tilePath, tileSize, tileResolution) 
     }
 }
 
-let keys = [];
-document.addEventListener('keydown', function (e) {
-    let k = e.keyCode;
-    keys[k] = true;
-    if (keys[87] || keys[65] || keys[83] || keys[68])
-        player.moving = true;
-});
-document.addEventListener('keyup', function (e) {
-    let k = e.keyCode;
-    keys[k] = false;
-    player.moving = false;
-    if (keys[87] || keys[65] || keys[83] || keys[68])
-        player.moving = true;
-    else {
-        player.moving = false;
-        player.animation.frame = 1;
-    }
-});
-function processMovement(delta) {
-    let speed = playerSpeed;
-    if (keys[87]) // W
-        player.move('up', speed * delta);
-    if (keys[65]) { // A
-        player.move('left', speed * delta);
-        player.dir = 'left';
-        player.texture.src = "assets/textures/RatLeft.png";
-    }
-    if (keys[83]) // S
-        player.move('down', speed * delta);
-    if (keys[68]) { // D
-        player.move('right', speed * delta);
-        player.dir = 'right';
-        player.texture.src = "assets/textures/RatRight.png";
-    }
-    camera.x = player.x - canvas.width / 2 + player.w / 2;
-    camera.y = player.y - canvas.height / 2 + player.h / 2;
+function moveCameraToPlayer() { // Moves the camera to the player
+    camera.x = player.x - canvas.width / 2 + player.w / 2 + camera.offset.x;
+    camera.y = player.y - canvas.height / 2 + player.h / 2 + camera.offset.y;
 }
 
+function update(delta) { }
+
 let lastTime = 0;
-function update(currentTime) {
+function updateEngine(currentTime) {
     const deltaTime = (currentTime - lastTime) / 1000;
     lastTime = currentTime;
 
+    update(deltaTime); // Game-specific update function
+
     // Update animation logic here using delta time
     for (let i = 0; i < objs.length; i++) {
-        objs[i].update();
-        objs[i].physicsUpdate();
+        objs[i].update(); // Updates all game objects
+        objs[i].physicsUpdate(); // Updates all game objects in the physics world
     }
-    processMovement(deltaTime);
-    redraw();
+    redraw(); // Draws all objects
 
-    requestAnimationFrame(update);
+    requestAnimationFrame(updateEngine);
 }
-requestAnimationFrame(update);
+requestAnimationFrame(updateEngine);
 
-setInterval(function () {
+setInterval(function () { // Animations run slower than the rest of the game, sp they have their own function here
     animate();
 }, 100);
-
-// INSTANTIATION:
-
-let player = new spriteObj(500, 300, 96, 96, 10, 'assets/textures/RatRight.png', 32, 32, 4, false);
-player.hitBoxOffset = 10;
-
-let npcTest = new npc(500, 400, 96, 96, 10, 'assets/textures/RatNpcRight.png', 'assets/textures/RatNpcLeft.png', 32, 32, 4);
-npcTest.hitBoxOffset = 10;
-
-let labTable = new spriteObj(200, 600, 44 * 3, 26 * 3, 30, 'assets/textures/labTable.png', 44, 26, 0, true);
-for (let i = 0; i < 3; i++) {
-    for (let j = 0; j < 3; j++) {
-        new box(i * 50 + 300, j * 50 + 300, 40, 40, 1, 'rgba(0, ' + i * 20 + 100 + ', ' + j * 20 + 100 + ', 1)', true);
-    }
-}
-
-for (let i = 0; i < 100; i++) {
-    for (let j = 0; j < 100; j++) {
-        new backgroundTile(i * 32 - 500, j * 32 - 500, 32, 32, 'assets/textures/groundTile.png', 16, 16, 0);
-    }
-}
-
-createBoxOfTiles(0, 0, 1200, 32, 0, 'assets/textures/blueTile.png', 32, 16);
-createBoxOfTiles(0, 0, 32, 1200, 0, 'assets/textures/blueTile.png', 32, 16);
-createBoxOfTiles(0, 1200 - 32, 1200, 32, 0, 'assets/textures/blueTile.png', 32, 16);
-createBoxOfTiles(1200 - 48, 0, 32, 1200, 0, 'assets/textures/blueTile.png', 32, 16);

@@ -7,8 +7,8 @@ const ctx = canvas.getContext("2d");
 function setWindowSize() {
     let w = window.innerWidth,
         h = window.innerHeight;
-    canvas.width = w * 0.8;
-    canvas.height = h * 0.85;
+    canvas.width = w * 0.9;
+    canvas.height = h * 0.8;
 }
 setWindowSize();
 
@@ -19,10 +19,8 @@ ctx.imageSmoothingEnabled = false;
 var objs = []; // All objects in the scene are contained here
 var backgroundObjs = []; // All background objects, always drawn first
 
-const world = {
-    friction: 0.01, // Determines how fast things will lose force
-    gravity: 0
-}
+let friction = 0.01; // Determines how fast things will lose force
+let gravity = 0.25; // Force of Gravity
 
 var playerSpeed = 300;
 
@@ -31,13 +29,18 @@ var camera = {
     y: 0
 }
 
+// Difficulty:
+var gap = 350;
+var heightGap = 500;
+var speed = 4;
+var dead = false;
+
 class obj { // General class, mainly for inheritance
-    constructor(x, y, w, h, mass, movable = false) {
+    constructor(x, y, w, h, movable = false) {
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
-        this.mass = mass;
 
         this.hitBoxOffset = 0;
         this.hitBox = {
@@ -63,7 +66,7 @@ class obj { // General class, mainly for inheritance
         if (this.colliderCheck('down') && this.forces.vertical > 0)
             this.forces.vertical = 0;
         else if (!this.colliderCheck('down') && this.movable)
-            this.forces.vertical += world.gravity;
+            this.forces.vertical += gravity;
 
         // Apply Horizontal Forces
         if (this.forces.horizontal > 0)
@@ -77,14 +80,14 @@ class obj { // General class, mainly for inheritance
             this.move('up', this.forces.vertical * -1);
         // Apply Horizontal Friction
         if (this.forces.horizontal > 0)
-            this.forces.horizontal -= world.friction;
+            this.forces.horizontal -= friction;
         else if (this.forces.horizontal < 0)
-            this.forces.horizontal += world.friction;
+            this.forces.horizontal += friction;
         // Apply Vertical Friction
         if (this.forces.vertical > 0)
-            this.forces.vertical -= world.friction;
+            this.forces.vertical -= friction;
         else if (this.forces.vertical < 0)
-            this.forces.vertical += world.friction;
+            this.forces.vertical += friction;
         // Round the forces
         this.forces.horizontal = Math.round(this.forces.horizontal * 100) / 100
         this.forces.vertical = Math.round(this.forces.vertical * 100) / 100
@@ -93,10 +96,10 @@ class obj { // General class, mainly for inheritance
     update() {
         // Updates hitbox position:
         this.hitBox = {
-            top: this.y + this.hitBoxOffset * 3,
-            bottom: this.y + this.h - this.hitBoxOffset * 2,
-            left: this.x + this.hitBoxOffset,
-            right: this.x + this.w - this.hitBoxOffset * 2
+            top: this.y + this.hitBoxOffset * 3 - camera.y,
+            bottom: this.y + this.h - this.hitBoxOffset * 2 - camera.y,
+            left: this.x + this.hitBoxOffset - camera.x,
+            right: this.x + this.w - this.hitBoxOffset * 2 - camera.x
         }
     }
 
@@ -191,8 +194,8 @@ class obj { // General class, mainly for inheritance
 }
 
 class box extends obj {
-    constructor(x, y, w, h, mass, color, movable = false) {
-        super(x, y, w, h, mass, movable);
+    constructor(x, y, w, h, color, movable = false) {
+        super(x, y, w, h, movable);
         this.color = color;
         this.hitBoxOffset = 0;
         this.hitBox = {
@@ -213,44 +216,9 @@ class box extends obj {
     }
 }
 
-class backgroundTile {
-    constructor(x, y, w, h, texturePath, resolutionX, resolutionY, frameCount) {
-        this.x = x;
-        this.y = y;
-        this.w = w;
-        this.h = h;
-        this.texturePath = texturePath;
-        this.texture = new Image(this.resolutionX, this.resolutionY);
-        this.texture.src = this.texturePath;
-        this.resolutionX = resolutionX;
-        this.resolutionY = resolutionY;
-        this.frameCount = frameCount;
-        this.animation = {
-            frame: 1,
-            frameCount: this.frameCount,
-            rate: 1
-        }
-        backgroundObjs.push(this);
-    }
-
-    animate() {
-        this.draw();
-        if (this.animation.frame >= this.animation.frameCount)
-            this.animation.frame = 1;
-        else
-            this.animation.frame++;
-    }
-
-    draw() {
-        let srcRect = { x: this.resolutionX * (this.animation.frame - 1), y: 0, width: this.resolutionX, height: this.resolutionY };
-        let destRect = { x: this.x, y: this.y, width: this.w, height: this.h };
-        ctx.drawImage(this.texture, srcRect.x, srcRect.y, srcRect.width, srcRect.height, this.x - camera.x, this.y - camera.y, destRect.width, destRect.height);
-    }
-}
-
 class spriteObj extends obj {
-    constructor(x, y, w, h, mass, texturePath, resolutionX, resolutionY, frameCount, movable = true) {
-        super(x, y, w, h, mass, movable);
+    constructor(x, y, w, h, texturePath, resolutionX, resolutionY, frameCount, movable = false) {
+        super(x, y, w, h, movable);
         this.texturePath = texturePath;
         this.resolutionX = resolutionX;
         this.resolutionY = resolutionY;
@@ -258,7 +226,6 @@ class spriteObj extends obj {
         this.texture.src = this.texturePath;
         this.frameCount = frameCount;
         this.dir = 'right';
-        this.moving = false;
 
         this.hitBoxOffset = 0;
 
@@ -278,46 +245,10 @@ class spriteObj extends obj {
     }
 
     draw() {
+        //ctx.fillRect(this.hitBox.left, this.hitBox.top, this.hitBox.right - this.hitBox.left, this.hitBox.bottom - this.hitBox.top); // Draw Hitboxes
         let srcRect = { x: this.resolutionX * (this.animation.frame - 1), y: 0, width: this.resolutionX, height: this.resolutionY };
         let destRect = { x: this.x, y: this.y, width: this.w, height: this.h };
         ctx.drawImage(this.texture, srcRect.x, srcRect.y, srcRect.width, srcRect.height, this.x - camera.x, this.y - camera.y, destRect.width, destRect.height);
-    }
-}
-
-class npc extends spriteObj {
-    constructor(x, y, w, h, mass, texturePathRight, texturePathLeft, resolutionX, resolutionY, frameCount) {
-        super(x, y, w, h, mass, texturePathRight, resolutionX, resolutionY, frameCount, false);
-        this.texturePathLeft = texturePathLeft;
-        this.texturePathRight = texturePathRight;
-        this.speed = 4;
-        this.dir = 'right';
-    }
-
-    changeDirection() {
-        if (this.dir == 'left') {
-            this.dir = 'right';
-            this.texture.src = this.texturePathRight;
-            this.move(this.dir, this.speed * 2);
-        }
-        else {
-            this.dir = 'left';
-            this.texture.src = this.texturePathLeft;
-            this.move(this.dir, this.speed * 2);
-        }
-    }
-
-    update() {
-        // Updates hitbox position:
-        this.hitBox = {
-            top: this.y + this.hitBoxOffset * 3,
-            bottom: this.y + this.h - this.hitBoxOffset * 2,
-            left: this.x + this.hitBoxOffset,
-            right: this.x + this.w - this.hitBoxOffset * 2
-        }
-        if (this.colliderCheck('left') !== false || this.colliderCheck('right') !== false) {
-            this.changeDirection();
-        }
-        this.move(this.dir, this.speed);
     }
 }
 
@@ -329,81 +260,65 @@ function sortByY(objects) { // Sorts objects in order of their y position
 
 function redraw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (let i = 0; i < backgroundObjs.length; i++) // Draws all objects in the background
+    for (let i = 0; i < backgroundObjs.length; i++)
         backgroundObjs[i].draw();
     let sorted = sortByY(objs); // Allows objects to be drawn in order of their y position to create a 3d effect
-    for (let i = 0; i < sorted.length; i++) // Draws all objects
+    for (let i = 0; i < sorted.length; i++)
         sorted[i].draw();
 }
 
-function animate() { // Plays animations for all objects
+function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < objs.length; i++) {
-        if (objs[i].index == player.index && !player.moving)
+        if (objs[i].index == player.index)
             continue;
         objs[i].animate();
     }
 }
 
-function createBoxOfTiles(x, y, w, h, mass, tilePath, tileSize, tileResolution) {
-    let xLength = Math.floor(w / tileSize);
-    let yLength = Math.floor(h / tileSize);
-    for (let i = 0; i < xLength; i++) {
-        for (let j = 0; j < yLength; j++) {
-            new spriteObj(i * tileSize + x, j * tileSize + y, tileSize, tileSize, mass, tilePath, tileResolution, tileResolution, 0, false);
-        }
-    }
+function die() {
+    speed = 0;
+    dead = true;
 }
 
+let canJump = true;
 let keys = [];
 document.addEventListener('keydown', function (e) {
+    if (dead)
+        return;
     let k = e.keyCode;
     keys[k] = true;
-    if (keys[87] || keys[65] || keys[83] || keys[68])
-        player.moving = true;
+
+    if (k == 87 || k == 32) {
+        if (canJump)
+            player.applyForce('vertical', -11);
+        canJump = false;
+    }
 });
 document.addEventListener('keyup', function (e) {
+    canJump = true;
     let k = e.keyCode;
     keys[k] = false;
-    player.moving = false;
-    if (keys[87] || keys[65] || keys[83] || keys[68])
-        player.moving = true;
-    else {
-        player.moving = false;
-        player.animation.frame = 1;
-    }
 });
-function processMovement(delta) {
-    let speed = playerSpeed;
-    if (keys[87]) // W
-        player.move('up', speed * delta);
-    if (keys[65]) { // A
-        player.move('left', speed * delta);
-        player.dir = 'left';
-        player.texture.src = "assets/textures/RatLeft.png";
-    }
-    if (keys[83]) // S
-        player.move('down', speed * delta);
-    if (keys[68]) { // D
-        player.move('right', speed * delta);
-        player.dir = 'right';
-        player.texture.src = "assets/textures/RatRight.png";
-    }
+function processMovement() {
     camera.x = player.x - canvas.width / 2 + player.w / 2;
-    camera.y = player.y - canvas.height / 2 + player.h / 2;
+    //camera.y = player.y - canvas.height / 2 + player.h / 2;
 }
 
 let lastTime = 0;
-function update(currentTime) {
-    const deltaTime = (currentTime - lastTime) / 1000;
-    lastTime = currentTime;
+function update() {
+
+    if (player.colliderCheck('right') || player.colliderCheck('up') || player.colliderCheck('down') || player.colliderCheck('left') || player.y < 0 || player.y + player.h > canvas.height)
+        die();
+    player.x += speed;
+    updatePipes();
 
     // Update animation logic here using delta time
     for (let i = 0; i < objs.length; i++) {
         objs[i].update();
         objs[i].physicsUpdate();
     }
-    processMovement(deltaTime);
+    processMovement();
     redraw();
 
     requestAnimationFrame(update);
@@ -416,26 +331,37 @@ setInterval(function () {
 
 // INSTANTIATION:
 
-let player = new spriteObj(500, 300, 96, 96, 10, 'assets/textures/RatRight.png', 32, 32, 4, false);
+let player = new spriteObj(500, 300, 96, 96, 'assets/textures/RatRight.png', 32, 32, 4, true);
 player.hitBoxOffset = 10;
 
-let npcTest = new npc(500, 400, 96, 96, 10, 'assets/textures/RatNpcRight.png', 'assets/textures/RatNpcLeft.png', 32, 32, 4);
-npcTest.hitBoxOffset = 10;
-
-let labTable = new spriteObj(200, 600, 44 * 3, 26 * 3, 30, 'assets/textures/labTable.png', 44, 26, 0, true);
-for (let i = 0; i < 3; i++) {
-    for (let j = 0; j < 3; j++) {
-        new box(i * 50 + 300, j * 50 + 300, 40, 40, 1, 'rgba(0, ' + i * 20 + 100 + ', ' + j * 20 + 100 + ', 1)', true);
+// PIPES:
+var lastPipeHieght = 0;
+function getRandomPipeHeight() {
+    lastPipeHieght = canvas.height - Math.floor(Math.random() * 300) - 50;
+    return lastPipeHieght;
+}
+let startingPos = 1000;
+var pipes = []
+let amountOfPipeSets = 1;
+for (let i = 0; i < 10; i++) {
+    pipes.push(new spriteObj(startingPos + gap * amountOfPipeSets, getRandomPipeHeight(), 64, 1024, 'assets/textures/pipe.png', 32, 512, 0, false));
+    pipes.push(new spriteObj(startingPos + gap * amountOfPipeSets, lastPipeHieght - canvas.height - heightGap, 64, 1024, 'assets/textures/pipeFlipped.png', 32, 512, 0, false));
+    amountOfPipeSets++;
+}
+let greatestX = 0;
+function updatePipes() {
+    for (let i = 0; i < pipes.length; i++) {
+        if (pipes[i].x + pipes[i].w - camera.x < 0) {
+            if (pipes[i].texturePath == 'assets/textures/pipe.png') {
+                pipes[i].y = getRandomPipeHeight();
+                for (let j = 0; j < pipes.length; j++) {
+                    if (pipes[j].x > greatestX)
+                        greatestX = pipes[j].x;
+                }
+            }
+            else
+                pipes[i].y = lastPipeHieght - canvas.height - 500;
+            pipes[i].x = greatestX + gap;
+        }
     }
 }
-
-for (let i = 0; i < 100; i++) {
-    for (let j = 0; j < 100; j++) {
-        new backgroundTile(i * 32 - 500, j * 32 - 500, 32, 32, 'assets/textures/groundTile.png', 16, 16, 0);
-    }
-}
-
-createBoxOfTiles(0, 0, 1200, 32, 0, 'assets/textures/blueTile.png', 32, 16);
-createBoxOfTiles(0, 0, 32, 1200, 0, 'assets/textures/blueTile.png', 32, 16);
-createBoxOfTiles(0, 1200 - 32, 1200, 32, 0, 'assets/textures/blueTile.png', 32, 16);
-createBoxOfTiles(1200 - 48, 0, 32, 1200, 0, 'assets/textures/blueTile.png', 32, 16);
