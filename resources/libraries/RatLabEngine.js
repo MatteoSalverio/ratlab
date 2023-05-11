@@ -36,7 +36,7 @@ var camera = { // Changes where and how game objects are displayed, it is the "p
 // Debug Variables
 var debug = {
     hideObjects: false, // Hides all objects in scene
-    showHitboxes: true // Shows hitboxes behind every object
+    showHitboxes: false // Shows hitboxes behind every object
 }
 var debugColor = [0, 100, 100]; // Color of hitboxes
 function getNewColor() {
