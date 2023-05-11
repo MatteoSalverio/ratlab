@@ -1,5 +1,4 @@
 // Rat Lab Engine - Copyright Rat Lab 2023
-// First Version of the Rat Lab Engine
 
 const canvas = document.getElementById("canvas"); // Canvas where game is displayed
 const ctx = canvas.getContext("2d");
@@ -19,7 +18,7 @@ var objs = []; // All objects in the scene are contained here
 var backgroundObjs = []; // All background objects, always drawn first
 
 const world = { // The physics world
-    friction: 0.01, // Determines how fast things will lose force
+    friction: 0.1, // Determines how fast things will lose force
     gravity: 0
 }
 
@@ -32,6 +31,21 @@ var camera = { // Changes where and how game objects are displayed, it is the "p
         x: 0,
         y: 0
     }
+}
+
+// Debug Variables
+var debug = {
+    hideObjects: false, // Hides all objects in scene
+    showHitboxes: true // Shows hitboxes behind every object
+}
+var debugColor = [0, 100, 100]; // Color of hitboxes
+function getNewColor() {
+    debugColor = [
+        debugColor[0] + 5,
+        debugColor[1] + 10,
+        debugColor[2] + 10
+    ];
+    return "rgb(" + debugColor[0] + "," + debugColor[1] + "," + debugColor[2] + ")";
 }
 
 class obj { // General class, mainly for inheritance
@@ -58,6 +72,7 @@ class obj { // General class, mainly for inheritance
         }
 
         this.index = objs.length;
+        this.hitBoxColor = getNewColor();
         objs.push(this); // Adds this object to the list of all game objects
     }
 
@@ -105,16 +120,16 @@ class obj { // General class, mainly for inheritance
         this.updateHitBox();
     }
 
-    update() { }
+    update() { } // Called every frame
 
-    draw() { }
+    draw() { } // Draws the object
 
     colliderCheck(dir) {
         for (let i = 0; i < objs.length; i++) {
             if (i == this.index) // Makes sure objects won't collide with themselves
                 continue;
             let o = objs[i];
-            let space = 5; // Allows you to slide on surfaces
+            let space = 7; // Allows you to slide on surfaces
             if (dir == 'up') {
                 if (this.hitBox.top <= o.hitBox.bottom && this.hitBox.bottom >= o.hitBox.top + space) {
                     if (this.hitBox.right >= o.hitBox.left + space && this.hitBox.left <= o.hitBox.right - space)
@@ -145,7 +160,7 @@ class obj { // General class, mainly for inheritance
 
     move(dir, speed) {
         speed *= 1;
-        let strength = 0.05; // Strength of push force
+        let strength = 0.2; // Strength of push force
         if (dir == 'up') {
             if (!this.colliderCheck('up')) {
                 this.y -= speed;
@@ -215,6 +230,11 @@ class box extends obj { // Simple box object
     }
 
     draw() {
+        ctx.fillStyle = this.hitBoxColor;
+        if (debug.showHitboxes)
+            ctx.fillRect(this.hitBox.left - camera.x, this.hitBox.top - camera.y, this.hitBox.right - this.hitBox.left, this.hitBox.bottom - this.hitBox.top); // Draw Hitboxes
+        if (debug.hideObjects)
+            return;
         ctx.fillStyle = this.color;
         ctx.fillRect(this.x - camera.x, this.y - camera.y, this.w, this.h);
     }
@@ -289,6 +309,10 @@ class spriteObj extends obj {
     }
 
     draw() {
+        if (debug.showHitboxes)
+            ctx.fillRect(this.hitBox.left - camera.x, this.hitBox.top - camera.y, this.hitBox.right - this.hitBox.left, this.hitBox.bottom - this.hitBox.top); // Draw Hitboxes
+        if (debug.hideObjects)
+            return;
         let srcRect = { x: this.resolutionX * (this.animation.frame - 1), y: 0, width: this.resolutionX, height: this.resolutionY };
         let destRect = { x: this.x, y: this.y, width: this.w, height: this.h };
         ctx.drawImage(this.texture, srcRect.x, srcRect.y, srcRect.width, srcRect.height, this.x - camera.x, this.y - camera.y, destRect.width, destRect.height);
@@ -390,9 +414,8 @@ function createBoxOfTiles(x, y, w, h, mass, tilePath, tileSize, tileResolution) 
     let xLength = Math.floor(w / tileSize);
     let yLength = Math.floor(h / tileSize);
     for (let i = 0; i < xLength; i++) {
-        for (let j = 0; j < yLength; j++) {
+        for (let j = 0; j < yLength; j++)
             new spriteObj(i * tileSize + x, j * tileSize + y, tileSize, tileSize, mass, tilePath, tileResolution, tileResolution, 0, false);
-        }
     }
 }
 

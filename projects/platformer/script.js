@@ -1,7 +1,7 @@
 // Game Setup:
 world.gravity = 0.25;
 canvas.style.backgroundColor = "darkslateblue";
-camera.offset.y = -200;
+camera.offset.y = -250;
 camera.offset.x = 50;
 
 // Variables:
@@ -22,7 +22,7 @@ createBoxOfTiles(0, 400, 1200, 32, 0, 'assets/textures/blueTile.png', 32, 16);
 function processMovement(delta) {
     let speed = playerSpeed;
     if ((getKey("W") || getKey("Space")) && canJump) {// W
-        player.applyForce('vertical', -7);
+        player.applyForce('vertical', -10);
     }
     if (getKey("A")) { // A
         player.move('left', speed * delta);
