@@ -1,0 +1,145 @@
+html {
+    background-color: black;
+    color: white;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+.taskBar {
+    margin: 0;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 50px;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    text-align: center;
+}
+
+.taskBar img {
+    width: 40px;
+    margin: 7px;
+}
+
+.desktop {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-image: url(assets/wallpaper/ventura.jpeg);
+    background-size: cover;
+}
+
+.iconGrid {
+    display: grid;
+    grid-template-rows: 64px 64px 64px 64px 64px 64px;
+    grid-template-columns: 90px 90px;
+}
+
+.icon {
+    width: 64px;
+    margin: 20px;
+    border: solid 0px black;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.icon:hover {
+    filter: brightness(115%);
+}
+
+.icon:active {
+    filter: brightness(130%);
+}
+
+.startMenu {
+    position: absolute;
+    bottom: 55px;
+    left: 5;
+    width: 30%;
+    height: 50%;
+    background-color: rgba(0, 0, 0, 0.7);
+    border: solid 0px black;
+    border-radius: 10px;
+}
+
+.dateTimePanel {
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    padding: 5px;
+    background-color: rgba(240, 248, 255, 0.078);
+    height: 40px;
+    width: 80px;
+    cursor: pointer;
+}
+
+.dateTimePanel p {
+    margin: 1px;
+}
+
+.window {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    height: 80%;
+    background-color: rgba(0, 0, 0, 0.15);
+    border: solid 0px black;
+    border-radius: 15px;
+}
+
+.controls {
+    position: absolute;
+    margin: 0;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    width: 100%;
+    height: 30px;
+    border: solid 0px black;
+    border-radius: 15px 15px 0px 0px;
+    cursor: pointer;
+}
+
+.controlBtns {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-45%);
+    left: 10px;
+}
+
+.controlsBtn {
+    width: 20px;
+    height: 20px;
+    margin: 0px;
+    padding: 0px;
+    border: solid 0px black;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.controlsBtn:hover {
+    filter: brightness(115%);
+}
+
+.controlsBtn:active {
+    filter: brightness(130%);
+}
+
+.minMaxBtn {
+    background-color: lightgreen;
+}
+
+.closeBtn {
+    background-color: tomato;
+}
+
+.windowBody {
+    width: 90%;
+    height: 90%;
+    transform: translate(4%, 4%);
+    padding: 15px;
+}

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Rat Lab Desktop</title>
+    <link rel="icon" href="https://ratlab.one/wp-content/uploads/2022/09/icon.png">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="desktop" id="desktop">
+        <div class="iconGrid">
+            <img class="icon" src="https://ratlab.one/wp-content/uploads/2022/09/icon.png">
+        </div>
+    </div>
+    <div class="startMenu" id="startMenu" style="display: none;">
+        <div class="iconGrid">
+
+        </div>
+    </div>
+    <div class="taskBar" id="taskBar">
+        <img class="icon" src="https://ratlab.one/wp-content/uploads/2022/09/icon.png"
+            onclick="toggleElement('startMenu')">
+        <img class="icon" src="assets/icons/settings.webp" onclick="toggleElement('settings')">
+        <img class="icon" src="assets/icons/safari.avif">
+        <div class="dateTimePanel">
+            <p id="date">5/18/23</p>
+            <p id="time">11:25 AM</p>
+        </div>
+    </div>
+
+
+    <div class="window" id="settings" style="background-color: rgb(64, 64, 64); display: none;">
+        <div class="controls">
+            <div class="controlBtns">
+                <button class="controlsBtn closeBtn" onclick="toggleElement('settings')">X</button>
+                <button class="controlsBtn minMaxBtn">~</button>
+            </div>
+        </div>
+        <div class="windowBody">
+            <h1>Settings</h1>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>

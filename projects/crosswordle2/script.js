@@ -10,6 +10,41 @@ var dataList = "";
 
 const puzzleFile = document.getElementById("puzzleFile");
 
+function resetData() {
+    localStorage.setItem('crossWordleScores', [[0, 'Empty'], [0, 'Empty'], [0, 'Empty'], [0, 'Empty'], [0, 'Empty']]);
+    localStorage.setItem('crossWordleNewUser', 'true');
+    location.reload();
+}
+
+if (localStorage.getItem('crossWordleScores') == null)
+    localStorage.setItem('crossWordleScores', [[0, 'Empty'], [0, 'Empty'], [0, 'Empty'], [0, 'Empty'], [0, 'Empty']]);
+else {
+    fillBoard();
+}
+
+if (localStorage.getItem('crossWordleNewUser') == null)
+    localStorage.setItem('crossWordleNewUser', 'true');
+if (localStorage.getItem('crossWordleNewUser') == 'true') {
+    togglePopup('howToPlay');
+    localStorage.setItem('crossWordleNewUser', 'false');
+}
+function fillBoard() {
+    let scores = localStorage.getItem("crossWordleScores").split(",");
+    let scoresArr = [], tempArr = [];
+    for (let i = 0; i < scores.length; i++) {
+        tempArr.push(scores[i]);
+        if ((i + 1) % 2 == 0) {
+            scoresArr.push(tempArr);
+            tempArr = [];
+        }
+    }
+    scoresArr.sort((a, b) => b[0] - a[0]);
+    for (let i = 0; i < 5; i++) {
+        document.getElementById("player" + (i + 1)).innerHTML = scoresArr[i][1];
+        document.getElementById("letters" + (i + 1)).innerHTML = scoresArr[i][0];
+    }
+}
+
 function instantiateTable(size) {
     for (let i = 0; i < size; i++) {
         mainTable.innerHTML += "<tr id='mainTableRow" + i + "'></tr>"
@@ -133,6 +168,7 @@ function unhighlightWord(id) {
         wordSpaces[i].style.filter = "brightness(100%)";
 }
 
+var pointsValue = 0, done = false;
 function updateColors() {
     // Uses the array of attempts
     for (let i = 0; i < dataList.words.length; i++) {
@@ -145,7 +181,7 @@ function updateColors() {
     }
 
     let points = 0;
-    /*for (let i = 0; i < dataList.words.length; i++) {
+    for (let i = 0; i < dataList.words.length; i++) {
         if (dataList.words[i].attempts.length <= 0)
             continue;
         let word = "";
@@ -162,8 +198,20 @@ function updateColors() {
             else if (colors[j] == orange)
                 points += 1;
         }
-    }*/
+    }
+    pointsValue = points;
     scoreDisplay.innerHTML = "Score: " + points;
+
+    let finished = true;
+    for (let i = 0; i < dataList.words.length; i++) {
+        if (dataList.words[i].word != dataList.words[i].attempts[dataList.words[i].attempts.length - 1] &&
+            dataList.words[i].attempts.length != dataList.words[i].length + 1)
+            finished = false;
+    }
+    if (finished && !done) {
+        done = true;
+        finishGame();
+    }
 }
 
 function checkGuess(wordId, guess) {
@@ -342,12 +390,23 @@ function onlineStart() { //For if the site is on a server (or VSCode Live Server
         .then(data => {
             dataList = JSON.parse(data);
             loadNewPuzzle();
+            /*selectWord(2);
+            processInput("R");
+            processInput("A");
+            processInput("N");
+            processInput("D");
+            processInput("O");
+            processInput("M");
+            processInput("ENTER");
+            updateColors();
+            finishGame();*/
         })
         .catch(err => {
-            console.clear();
+            console.error(err)
+            /*console.clear();
             console.error("Error: Cannot Access Online Puzzles");
             alert("NOTICE: CrossWordle is meant to be run on an online website. CrossWordle will now run in offline mode")
-            offlineStart();
+            offlineStart();*/
         });
 }
 function offlineStart() {
@@ -426,3 +485,17 @@ const downloadToFile = (content, filename, contentType) => {
 
     URL.revokeObjectURL(a.href);
 };
+
+function finishGame() {
+    let name = "Null";
+    if (pointsValue > document.getElementById("letters5").innerHTML * 1)
+        name = prompt("Congrats, you're on the leaderboard! What is your name?");
+    else
+        scores.push(prompt("What is your name?"));
+    let scores = localStorage.getItem("crossWordleScores").split(",");
+    scores.push(pointsValue + "");
+    scores.push(name);
+    localStorage.setItem("crossWordleScores", scores);
+    fillBoard();
+    togglePopup('leaderboards');
+}
