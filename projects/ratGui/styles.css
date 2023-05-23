@@ -1,7 +1,17 @@
 html {
+    height: 100%;
     background-color: black;
     color: white;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+.prevent-select {
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .taskBar {
@@ -16,8 +26,8 @@ html {
 }
 
 .taskBar img {
-    width: 37px;
-    margin: 7px;
+    width: 45px;
+    margin: 3px;
 }
 
 .desktop {
@@ -43,6 +53,7 @@ html {
     border: solid 0px black;
     border-radius: 10px;
     cursor: pointer;
+    box-shadow: 2px 2px 5px rgba(24, 24, 24, 0.4);
 }
 
 .icon:hover {
