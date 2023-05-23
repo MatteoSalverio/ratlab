@@ -16,7 +16,7 @@ html {
 }
 
 .taskBar img {
-    width: 40px;
+    width: 37px;
     margin: 7px;
 }
 
@@ -82,10 +82,10 @@ html {
 .window {
     position: absolute;
     left: 50%;
-    top: 50%;
+    top: 45%;
     transform: translate(-50%, -50%);
-    width: 80%;
-    height: 80%;
+    width: 70%;
+    height: 70%;
     background-color: rgba(0, 0, 0, 0.15);
     border: solid 0px black;
     border-radius: 15px;
@@ -115,6 +115,7 @@ html {
     width: 20px;
     height: 20px;
     margin: 0px;
+    margin-right: 5px;
     padding: 0px;
     border: solid 0px black;
     border-radius: 20px;
@@ -135,13 +136,6 @@ html {
 
 .closeBtn {
     background-color: tomato;
-}
-
-.windowBody {
-    width: 90%;
-    height: 90%;
-    transform: translate(4%, 4%);
-    padding: 15px;
 }
 
 .windowFrame {

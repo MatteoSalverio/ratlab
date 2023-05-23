@@ -14,6 +14,7 @@
         </div>
     </div>
     <div class="startMenu" id="startMenu" style="display: none;">
+        <h1 style="margin-left: 20px;">Rat Lab Desktop</h1>
         <div class="iconGrid">
 
         </div>
@@ -21,23 +22,15 @@
     <div class="taskBar" id="taskBar">
         <img class="icon" src="https://ratlab.one/wp-content/uploads/2022/09/icon.png"
             onclick="toggleElement('startMenu')">
-        <img class="icon" src="assets/icons/settings.webp" onclick="toggleElement('settings')">
-        <img class="icon" src="assets/icons/safari.avif">
+        <img class="icon" src="assets/icons/settings.webp" onclick="openWindow('settings')">
+        <img class="icon" src="assets/icons/safari.avif" onclick="openWindow('browser')">
         <div class="dateTimePanel">
             <p id="date">5/18/23</p>
             <p id="time">11:25 AM</p>
         </div>
     </div>
 
-    <div class="window" id="settings" style="background-color: rgb(64, 64, 64); display: none;">
-        <div class="controls">
-            <div class="controlBtns">
-                <button class="controlsBtn closeBtn" onclick="toggleElement('settings')">X</button>
-                <button class="controlsBtn minMaxBtn">~</button>
-            </div>
-        </div>
-        <iframe class="windowFrame" src="https://ratlab.one" height="100%" width="100%"></iframe>
-    </div>
+    <div id="windows"></div>
 
     <script src="script.js"></script>
 </body>

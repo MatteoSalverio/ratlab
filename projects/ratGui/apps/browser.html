@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Browser</title>
+    <style>
+        html {
+            margin: 10px;
+            background-color: rgb(32, 32, 32);
+            color: aliceblue;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        input {
+            font-size: 16px;
+            padding: 5px;
+            background-color: rgba(240, 248, 255, 0.15);
+            border: solid 1px aliceblue;
+            border-radius: 5px;
+            color: aliceblue;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Rat Lab Desktop Browser <span style="font-size: 20px; font-weight: normal;">v1.0</span></h1>
+    <h2>Input URL Here:</h2>
+    <input type="text" id="urlBar">
+
+    <script>
+        const urlBar = document.getElementById("urlBar");
+        urlBar.addEventListener("keydown", function(e) {
+            if (e.key == 'Enter') {
+                window.open(urlBar.value, "_self");
+            }
+        });
+    </script>
+</body>
+
+</html>
