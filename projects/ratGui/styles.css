@@ -8,6 +8,10 @@ html {
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 
+body {
+    overflow: hidden; /* Disables scrolling on the desktop */
+}
+
 .prevent-select {
     -webkit-user-select: none;
     -ms-user-select: none;
@@ -37,7 +41,7 @@ html {
     position: absolute;
     top: 0;
     left: 0;
-    background-image: url(assets/wallpaper/ventura.jpeg);
+    background-image: url(assets/wallpaper/RatLabWallpaper.png);
     background-size: cover;
 }
 
