@@ -444,6 +444,6 @@ function updateEngine(currentTime) {
 }
 requestAnimationFrame(updateEngine);
 
-setInterval(function () { // Animations run slower than the rest of the game, sp they have their own function here
+setInterval(function () { // Animations run slower than the rest of the game, so they have their own function here
     animate();
 }, 100);

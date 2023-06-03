@@ -6,7 +6,7 @@ const windows = document.getElementById("windows");
 
 var highestZ = 0;
 
-var icons = ["settings", "browser", "notes"];
+var icons = ["settings", "browser", "notes", "terminal"];
 
 function fillIcons() {
     let grids = document.getElementsByClassName("iconGrid");
@@ -57,8 +57,9 @@ function openWindow(id) {
             highestZ++;
             w.style.zIndex = highestZ;
         }
-        else
+        else {
             toggleElement(id);
+        }
         return;
     }
     highestZ++;
@@ -76,7 +77,8 @@ function openWindow(id) {
 }
 
 function minimizeWindow(id) {
-    document.getElementById(id).style.display = 'none';
+    let elem = document.getElementById(id);
+    elem.style.display = 'none';
 }
 
 function closeWindow(id) {
@@ -139,6 +141,10 @@ function updateTasks() {
     }
 }
 
+desktop.addEventListener("click", function () {
+    setElementState("startMenu", false);
+});
+
 setInterval(() => { // Updates every millisecond
     updateTime();
 }, 1);
@@ -147,4 +153,6 @@ setInterval(() => { // Updates every half second
     updateTasks();
 }, 500);
 
-openWindow("browser");
+setInterval(() => { // Updates every two seconds
+    // Implement a method that updates settings based on data.json
+}, 2000);
