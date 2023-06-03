@@ -18,25 +18,20 @@ function updateTime() {
     let min = newDate.getMinutes();
     if ((min + "").length < 2)
         min = "0" + min;
-    /*let part = "AM";
-    if (newDate.getTime() > 43200000)
-        part = "PM";*/
-    time.innerHTML = newDate.getHours() + ":" + min// + " " + part;
+    let h = newDate.getHours();
+    let p = "AM";
+    if (h > 12) {
+        h -= 12;
+        p = "PM";
+    }
+    time.innerHTML = h + ":" + min + " " + p;
 }
 
 function updateWindowPosition() {
     if (mousedown) {
         let w = document.getElementById(activeWindow);
-        let deltaPos = {
-            x: mousePos.x - oldMousePos.x,
-            y: mousePos.y - oldMousePos.y
-        };
-        let windowPosition = {
-            top: w.style.top.replace("px", "") * 1,
-            left: w.style.left.replace("px", "") * 1
-        }
-        w.style.left = windowPosition + deltaPos + "px";
-        w.style.top = windowPosition + deltaPos + "px";
+        w.style.left = (mousePos.x) + "px";
+        w.style.top = (mousePos.y) + "px";
     }
 }
 
@@ -47,7 +42,6 @@ setInterval(() => {
 
 var mousedown = false;
 var activeWindow = "";
-var oldMousePos = { x: 0, y: 0 };
 var mousePos = { x: 0, y: 0 };
 function openWindow(id) {
     if (document.getElementById(id) != null) {
@@ -56,7 +50,7 @@ function openWindow(id) {
     }
     let temp = "";
     temp += "<div class='window' id='" + id + "' style='display: inline;'>";
-    temp += '<div class="controls" id="' + id + '_controls">';
+    temp += '<div class="controls" id="' + id + '_controls"' + ' onclick="clickControls(' + "'" + id + "'" + ')">';
     temp += '<div class="controlBtns">';
     temp += '<button class="controlsBtn closeBtn" onclick="' + "closeWindow('" + id + "')" + '">X</button>';
     temp += '<button class="controlsBtn minMaxBtn" onclick="' + "maximizeWindow('" + id + "')" + '">~</button>';
@@ -64,6 +58,7 @@ function openWindow(id) {
     temp += '<iframe class="windowFrame" src="apps/' + id + '.html" width="100%" height="100%"></iframe>'
     windows.innerHTML += temp;
     let controls = document.getElementById(id + "_controls");
+    console.log(controls)
     controls.addEventListener("mousedown", function (e) {
         mousedown = true;
         activeWindow = id;
@@ -74,11 +69,15 @@ function openWindow(id) {
     });
 }
 
+function clickControls(id) {
+    //let controls = document.getElementById(id + "_controls");
+
+}
+
 document.addEventListener("mousemove", function (e) {
-    oldMousePos.x = mousePos.x;
-    oldMousePos.y = mousePos.y;
     mousePos.x = e.clientX;
     mousePos.y = e.clientY;
+    console.log(mousePos.x)
 });
 
 function minimizeWindow(id) {
