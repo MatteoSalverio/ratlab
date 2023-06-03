@@ -10,20 +10,30 @@
 <body>
     <div class="desktop" id="desktop">
         <div class="iconGrid">
-            <img class="icon" src="https://ratlab.one/wp-content/uploads/2022/09/icon.png">
         </div>
     </div>
+
     <div class="startMenu" id="startMenu" style="display: none;">
-        <h1 style="margin-left: 20px;">Rat Lab Desktop!</h1>
-        <p style="margin-left: 20px;">Welcome to the Rat Lab Desktop</p>
+        <h1 style="margin-left: 20px; margin-bottom: 3px;">Rat Lab Desktop!</h1>
+        <p style="margin-left: 25px; margin-right: 25px;">Welcome to the Rat Lab Desktop, your launchpad for all sorts
+            of projects and resources!</p>
+        <br>
+        <h3 style="margin-left: 20px; margin-bottom: 0px;">Apps:</h3>
         <div class="iconGrid"></div>
     </div>
+
+    <div class="taskView" id="taskView" style="display: none;">
+        <h1 style="margin-left: 20px;">Task View</h1>
+        <h3 style="margin-left: 20px;">Open Tasks:</h3>
+        <table id="taskViewTable" class="taskViewTable"></table>
+    </div>
+
     <div class="taskBar" id="taskBar">
-        <img class="icon" src="assets/icons/ratIcon.png"
-            onclick="toggleElement('startMenu')" style="width: 38px; margin: 7px;">
-        <img class="icon" src="assets/icons/settings.png" onclick="openWindow('settings')">
-        <img class="icon" src="assets/icons/safari.png" onclick="openWindow('browser')">
-        <img class="icon" src="assets/icons/notes.png" onclick="openWindow('notes')">
+        <div id="taskBarIcons">
+            <img class="icon" src="assets/icons/ratIcon.png" onclick="toggleElement('startMenu')"
+                style="width: 38px; margin: 7px;">
+            <img class="icon" src="assets/icons/taskView.png" onclick="toggleElement('taskView')">
+        </div>
         <div class="dateTimePanel">
             <p id="date">5/18/23</p>
             <p id="time">11:25 AM</p>

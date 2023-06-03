@@ -9,7 +9,8 @@ html {
 }
 
 body {
-    overflow: hidden; /* Disables scrolling on the desktop */
+    /* Disables scrolling on the desktop */
+    overflow: hidden;
 }
 
 .prevent-select {
@@ -47,8 +48,8 @@ body {
 
 .iconGrid {
     display: grid;
-    grid-template-rows: 64px 64px 64px 64px 64px 64px;
-    grid-template-columns: 90px 90px;
+    grid-template-rows: 72px 72px 72px;
+    grid-template-columns: 72px 72px 72px 72px 72px 72px;
 }
 
 .icon {
@@ -71,12 +72,49 @@ body {
 .startMenu {
     position: absolute;
     bottom: 55px;
-    left: 5;
+    left: 5px;
     width: 30%;
     height: 50%;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.9);
     border: solid 0px black;
     border-radius: 10px;
+    z-index: 10;
+}
+
+.taskView {
+    position: absolute;
+    bottom: 55px;
+    right: 5px;
+    width: 30%;
+    height: 50%;
+    background-color: rgba(0, 0, 0, 0.9);
+    border: solid 0px black;
+    border-radius: 10px;
+    z-index: 10;
+}
+
+.taskViewTable {
+    margin-left: 20px;
+}
+
+.taskViewTable th {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 5px;
+}
+
+.taskViewTable td {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 5px;
+}
+
+.taskButton {
+    text-align: center;
+    cursor: pointer;
+}
+
+.taskButton:hover {
+    text-align: center;
+    cursor: pointer;
 }
 
 .dateTimePanel {
