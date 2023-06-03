@@ -21,6 +21,7 @@ function updateTime() {
     /*let part = "AM";
     if (newDate.getTime() > 43200000)
         part = "PM";*/
+        
     time.innerHTML = newDate.getHours() + ":" + min// + " " + part;
 }
 
@@ -63,7 +64,7 @@ function openWindow(id) {
     temp += '</div></div>';
     temp += '<iframe class="windowFrame" src="apps/' + id + '.html" width="100%" height="100%"></iframe>'
     windows.innerHTML += temp;
-    let controls = document.getElementById(id + "_controls");
+    /*let controls = document.getElementById(id + "_controls");
     controls.addEventListener("mousedown", function (e) {
         mousedown = true;
         activeWindow = id;
@@ -71,7 +72,7 @@ function openWindow(id) {
     });
     controls.addEventListener("mouseup", function () {
         mousedown = false;
-    });
+    });*/
 }
 
 document.addEventListener("mousemove", function (e) {
@@ -117,4 +118,4 @@ function maximizeWindow(id) {
     }
 }
 
-openWindow("notes");
+openWindow("browser");
