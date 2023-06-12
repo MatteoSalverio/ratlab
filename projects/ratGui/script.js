@@ -71,7 +71,10 @@ function openWindow(id) {
     temp += '<button class="controlsBtn closeBtn" onclick="' + "closeWindow('" + id + "')" + '">X</button>';
     temp += '<button class="controlsBtn minMaxBtn" onclick="' + "maximizeWindow('" + id + "')" + '">~</button>';
     temp += '</div></div>';
-    temp += '<iframe class="windowFrame" src="apps/' + id + '.html" width="100%" height="100%"></iframe>';
+    if (id == "terminal")
+        temp += '<iframe class="windowFrame" src="https://matteosalverio.github.io/ratlab/projects/vcpu" width="100%" height="100%"></iframe>';
+    else
+        temp += '<iframe class="windowFrame" src="apps/' + id + '.html" width="100%" height="100%"></iframe>';
     windows.innerHTML += temp;
     setElementState("startMenu", false);
 }
