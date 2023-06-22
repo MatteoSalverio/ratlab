@@ -5,6 +5,8 @@ var dataList = "";
 
 var words = [];
 
+var selectedSpace = null;
+
 // Menus
 const sizeInput = document.getElementById("size");
 const locationInput = document.getElementById("location");
@@ -31,6 +33,10 @@ function instantiateTable(size) {
     for (let i = 0; i < spaces.length; i++) {
         spaces[i].addEventListener("click", event => {
             locationInput.value = event.target.id;
+            selectedSpace = event.target.id;
+            for (let i = 0; i < dataList.words.length; i++)
+                unhighlightWord(i);
+            selectedWordId = -1;
         });
     }
 }
@@ -53,7 +59,8 @@ function addWord() {
         let space = null;
         space = document.getElementById(getPos(i)[0] + "," + getPos(i)[1]);
         space.innerHTML = word[i];
-        space.style.backgroundColor = "aliceblue"
+        space.style.backgroundColor = "aliceblue";
+        space.className += " " + dataList.words.length;
     }
     let wordObj = {
         "id": dataList.words.length,
@@ -63,7 +70,8 @@ function addWord() {
         "attempts": []
     };
     dataList.words.push(wordObj);
-    console.log(dataList);
+    wordInput.value = "";
+    loadNewPuzzle();
 }
 
 function save() {
@@ -99,6 +107,7 @@ function wordleGetPos(id, index) {
         pos[0] = initialPos[0] * 1 + index * 1;
     return pos;
 }
+var selectedWordId = null;
 function fillTable() {
     for (let i = 0; i < dataList.words.length; i++) {
         for (let j = 0; j < dataList.words[i].word.length; j++) {
@@ -112,16 +121,25 @@ function fillTable() {
                 let k = 0;
                 while (spaceClasses[k] * 1 == NaN)
                     k++
-                highlightWord(spaceClasses[0]);
-                updateColors();
+                highlightWord(spaceClasses[1]);
             });
             space.addEventListener("mouseout", event => {
                 let spaceClasses = event.target.classList;
                 let k = 0;
                 while (spaceClasses[k] * 1 == NaN)
                     k++
-                unhighlightWord(spaceClasses[0]);
-                updateColors();
+                if (selectedWordId != spaceClasses[1])
+                    unhighlightWord(spaceClasses[1]);
+            });
+            space.addEventListener("click", event => {
+                let spaceClasses = event.target.classList;
+                let k = 0;
+                while (spaceClasses[k] * 1 == NaN)
+                    k++
+                selectedWordId = spaceClasses[1];
+                for (let i = 0; i < dataList.words.length; i++)
+                    unhighlightWord(i);
+                highlightWord(spaceClasses[1]);
             });
         }
     }
@@ -147,9 +165,10 @@ function loadNewPuzzle() {
         mainTable.innerHTML = "";
         instantiateTable(dataList.size);
         fillTable();
-        console.log(dataList)
+        sizeInput.value = dataList.size;
     }
-    catch {
+    catch (e) {
+        console.log(e)
         console.error("Error loading puzzle")
     }
 }
@@ -157,28 +176,41 @@ function loadNewPuzzle() {
 function highlightWord(id) {
     let wordSpaces = getWordSpaces(id);
     for (let i = 0; i < wordSpaces.length; i++)
-        wordSpaces[i].style.filter = "brightness(200%)";
+        wordSpaces[i].style.backgroundColor = "lightskyblue";
 }
 
 function unhighlightWord(id) {
     let wordSpaces = getWordSpaces(id);
     for (let i = 0; i < wordSpaces.length; i++)
-        wordSpaces[i].style.filter = "brightness(100%)";
+        wordSpaces[i].style.backgroundColor = "aliceblue";
 }
 
 function getWordSpaces(id) {
     let arr = []
     for (let i = 0; i < dataList.words[id].word.length; i++) {
-        arr.push(document.getElementById(getPos(id, i)[0] + "," + getPos(id, i)[1]));
+        arr.push(document.getElementById(wordleGetPos(id, i)[0] + "," + wordleGetPos(id, i)[1]));
     }
     return arr;
 }
+
+function removeWord() {
+    dataList.words.splice(selectedWordId, 1);
+    for (let i = 0; i < dataList.words.length; i++) {
+        if (dataList.words[i].id > selectedWordId)
+            dataList.words[i].id--;
+    }
+    loadNewPuzzle();
+}
+
+var loaded = false;
 
 function onlineStart() { //For if the site is on a server (or VSCode Live Server)
     fetch('template.json')
         .then(response => response.text())
         .then(data => {
             dataList = JSON.parse(data);
+            loadNewPuzzle();
+            loaded = true;
         })
         .catch(err => {
             console.clear();
@@ -189,3 +221,18 @@ function onlineStart() { //For if the site is on a server (or VSCode Live Server
 }
 
 onlineStart();
+
+setInterval(function () {
+    if (!loaded)
+        return;
+    for (let i = 0; i < sizeInput.value; i++) {
+        for (let j = 0; j < sizeInput.value; j++) {
+            if (document.getElementById(i + "," + j).className == "space")
+                document.getElementById(i + "," + j).style.backgroundColor = "rgba(255, 255, 255, 0.1)";
+        }
+    }
+    if (selectedWordId != null && selectedWordId != -1)
+        highlightWord(selectedWordId);
+    if (selectedSpace != null)
+        document.getElementById(selectedSpace).style.backgroundColor = green;
+}, 1);

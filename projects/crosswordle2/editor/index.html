@@ -47,22 +47,36 @@
         }
 
         #addWord {
-            top: 27%;
-            right: 10%;
-            transform: translate(200%);
+            top: 30px;
+            right: 30px;
+            width: 15%;
+            height: 40%;
         }
 
         #removeWord {
-            top: 25%;
-            right: 10%;
-            transform: translate(200%, 110%);
+            bottom: 30px;
+            right: 30px;
+            width: 15%;
+            height: 40%;
+        }
+
+        .panel {
+            background: darkslateblue;
+            padding: 5px;
+            border-radius: 10px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: black;
+            position: fixed;
+            z-index: 9;
+            font-size: 20px;
         }
     </style>
 </head>
 
 <body>
     <h1>Cross Wordle Editor</h1>
-    <h2>FBLA Nationals Pre Release 2.1 - <a href="https://discord.gg/bEeh62EGt8">Report bugs here!</a></h2>
+    <!--<h2>FBLA Nationals Pre Release 2.1 - <a href="https://discord.gg/bEeh62EGt8">Report bugs here!</a></h2>-->
 
     <table style="margin: auto;">
         <tbody id="mainTable" style="display: inline;"></tbody>
@@ -72,7 +86,7 @@
     <p>Location:</p>
     <input type="text" id="location" name="location" placeholder="Location" value="0,0">
 
-    <div class="popup" id="addWord" style="display: inline;">
+    <div class="panel" id="addWord" style="display: inline;">
         <h3 style="float: left; margin: 10px 20px; text-decoration: underline;">Add Word</h3>
         <button class="exitButton" onclick="togglePopup('addWord')">X</button>
         <div style="text-align: left; margin: 20px;">
@@ -86,7 +100,7 @@
                 Word</button>
         </div>
     </div>
-    <div class="popup" id="removeWord" style="display: inline;">
+    <div class="panel" id="removeWord" style="display: inline;">
         <h3 style="float: left; margin: 10px 20px; text-decoration: underline;">Remove Word</h3>
         <button class="exitButton" onclick="togglePopup('removeWord')">X</button>
         <br><br>
@@ -124,14 +138,15 @@
         <!--<br>
         <button onclick="togglePopup('addWord')">Add Word</button>
         <br>
-        <button onclick="togglePopup('removeWord')">Remove Word</button>-->
+        <button onclick="togglePopup('removeWord')">Remove Word</button>
         <br>
-        <button onclick="togglePopup('settings')">Settings</button>
+        <button onclick="togglePopup('settings')">Settings</button>-->
         <br>
-        <button onclick="save()">Save</button>
+        <button onclick="save()">Save Puzzle</button>
     </div>
 
-    <h3 style="position: absolute; bottom: 10px; left: 10px; margin: 0;">Copyright RatLab 2023</h3>
+    <h3 style="position: absolute; bottom: 10px; left: 10px; margin: 0;">Matteo Salverio -
+        FBLA 2023</h3>
 
     <script src="script.js"></script>
 </body>

@@ -10,6 +10,10 @@ var dataList = "";
 
 const puzzleFile = document.getElementById("puzzleFile");
 
+var settings = {
+    spellCheck: true
+}
+
 function resetData() {
     localStorage.setItem('crossWordleScores', [[0, 'Empty'], [0, 'Empty'], [0, 'Empty'], [0, 'Empty'], [0, 'Empty']]);
     localStorage.setItem('crossWordleNewUser', 'true');
@@ -91,14 +95,6 @@ function resetKeyboard() {
     let keyButtons = document.getElementsByClassName("key");
     for (let i = 0; i < keyButtons.length; i++) {
         keyButtons[i].style.backgroundColor = "lightgray";
-    }
-}
-
-function shrink() { // Will shrink all wordle table spaces to fit the screen when the word is larger
-    let spaces = document.getElementsByClassName("wordleTableSpaces");
-    console.log(spaces)
-    for (let i = 0; i < spaces; i++) {
-        console.log(spaces[i]);
     }
 }
 
@@ -219,6 +215,7 @@ function checkGuess(wordId, guess) {
     let word = dataList.words[wordId].word;
     let letters = [];
     let lettersFound = [];
+
     for (let i = 65; i <= 90; i++) {
         letters[i] = 0;
         lettersFound[i] = 0;
@@ -226,21 +223,27 @@ function checkGuess(wordId, guess) {
     for (let i = 0; i < word.length; i++) {
         letters[word[i].charCodeAt()]++;
     }
-    for (let i = 0; i < word.length; i++) {
+
+    for (let i = 0; i < word.length; i++) { // Count all correct letters first
         if (guess[i] == word[i]) {
             lettersFound[guess[i].charCodeAt()]++;
-            arr.push(green);
+            arr[i] = green;
         }
+    }
+    for (let i = 0; i < word.length; i++) { // Count all other letters after
+        if (guess[i] == word[i])
+            continue;
         else if (word.indexOf(guess[i]) > -1) {
             lettersFound[guess[i].charCodeAt()]++;
             if (lettersFound[guess[i].charCodeAt()] > letters[guess[i].charCodeAt()])
-                arr.push(red)
+                arr[i] = (red)
             else
-                arr.push(orange);
+                arr[i] = (orange);
         }
         else
-            arr.push(red);
+            arr[i] = (red);
     }
+
     return arr;
 }
 
@@ -262,10 +265,6 @@ function showWordleTable(wordId) {
     menu.style.display = "none";
 
     resetKeyboard();
-
-    if (dataList.words[wordId].word.length + 1 > 7) {
-        shrink();
-    }
 
     wordleTable.innerHTML = "";
     for (let i = 0; i < dataList.words[wordId].word.length + 1; i++) {
@@ -331,6 +330,8 @@ document.addEventListener("keydown", function (e) {
 });
 
 function processInput(k) {
+    if (dataList.words[selectedWordId].word == dataList.words[selectedWordId].attempts[dataList.words[selectedWordId].attempts.length - 1])
+        return;
     if (k == "BACKSPACE") {
         if (column <= 0)
             return;
@@ -350,6 +351,27 @@ function processInput(k) {
     column++;
 }
 
+function spellCheck(string) {
+    return fetch('words.txt')
+        .then(response => response.text())
+        .then(data => {
+            const wordList = data.split('\n');
+            const sanitizedLine = string.trim().toLowerCase();
+            return wordList.includes(sanitizedLine + "\r");
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            return false; // Return false in case of an error
+        });
+}
+
+async function animateRow() {
+    for (let i = 0; i < dataList.words[selectedWordId].word.length; i++) {
+        document.getElementById("wordleTable[" + (dataList.words[selectedWordId].attempts.length - 1) + "," + i + "]").style.animation = "flip 400ms ease forwards";
+        await new Promise((resolve) => setTimeout(resolve, 200));
+    }
+}
+
 function wordleEnter() {
     let guess = "";
     for (let i = 0; i < dataList.words[selectedWordId].word.length; i++) {
@@ -359,22 +381,38 @@ function wordleEnter() {
     if (guess.length < dataList.words[selectedWordId].word.length)
         return;
 
-    const url = "https://api.wordnik.com/v4/word.json/" + guess.toLowerCase() + "/definitions?limit=200&includeRelated=false&useCanonical=false&includeTags=false&api_key=a2a73e7b926c924fad7001ca3111acd55af2ffabf50eb4ae5";
-    $.ajax({
-        type: "GET",
-        url: url
-    }).done(function () { //If word exists
+    if (settings.spellCheck) {
+        spellCheck(guess.toLowerCase())
+            .then(result => {
+                if (!result) {
+                    togglePopup("notWordAlert");
+                    return;
+                }
+                else {
+                    column = 0;
+                    wordleGuess(guess);
+                    dataList.words[selectedWordId].attempts.push(guess);
+                    if (guess == dataList.words[selectedWordId].word || dataList.words[selectedWordId].attempts.length >= dataList.words[selectedWordId].word.length + 1) {
+                        animateRow();
+                        //closeWordleTable();
+                    }
+                }
+            });
+    }
+    else {
         column = 0;
         wordleGuess(guess);
         dataList.words[selectedWordId].attempts.push(guess);
-        if (guess == dataList.words[selectedWordId].word || dataList.words[selectedWordId].attempts.length >= dataList.words[selectedWordId].word.length + 1)
-            closeWordleTable();
-    }).fail(function () { //If word does not exist
-        togglePopup("notWordAlert");
-    });
+        if (guess == dataList.words[selectedWordId].word || dataList.words[selectedWordId].attempts.length >= dataList.words[selectedWordId].word.length + 1) {
+            animateRow();
+            //closeWordleTable();
+        }
+    }
 }
 
 function wordleGuess(guess) {
+    if (guess != dataList.words[selectedWordId].word)
+        document.getElementById("wordleTableRow" + dataList.words[selectedWordId].attempts.length).style.animation = "shake .8s ease-in";
     let colors = checkGuess(selectedWordId, guess);
     for (let i = 0; i < dataList.words[selectedWordId].word.length; i++) {
         let space = document.getElementById("wordleTable[" + dataList.words[selectedWordId].attempts.length + "," + i + "]");
@@ -383,33 +421,32 @@ function wordleGuess(guess) {
     }
 }
 
-const puzzleName = 'recreation';
+function enterString(string) {
+    for (let i = 0; i < string.length; i++)
+        processInput(string[i].toUpperCase());
+    processInput("ENTER");
+}
+
+const puzzles = ["clothing", "recreation", "word"];
+const puzzleName = puzzles[Math.floor(Math.random() * puzzles.length)];
+//const puzzleName = "word";
 function onlineStart() { //For if the site is on a server (or VSCode Live Server)
     fetch('puzzles/' + puzzleName + '.json')
         .then(response => response.text())
         .then(data => {
             dataList = JSON.parse(data);
             loadNewPuzzle();
-            /*selectWord(2);
-            processInput("R");
-            processInput("A");
-            processInput("N");
-            processInput("D");
-            processInput("O");
-            processInput("M");
-            processInput("ENTER");
-            updateColors();
-            finishGame();*/
         })
         .catch(err => {
-            console.error(err)
-            /*console.clear();
+            //console.error(err)
+            console.clear();
             console.error("Error: Cannot Access Online Puzzles");
             alert("NOTICE: CrossWordle is meant to be run on an online website. CrossWordle will now run in offline mode")
-            offlineStart();*/
+            offlineStart();
         });
 }
 function offlineStart() {
+    settings.spellCheck = false;
     dataList = JSON.parse('{"size": 11,"words": [{"id": 0,"location": "1,3","direction": "horizontal","word": "JACKET","attempts": []},{"id": 1,"location": "1,3","direction": "vertical","word": "JEANS","attempts": []},{"id": 2,"location": "3,1","direction": "horizontal","word": "FLANNEL","attempts": []},{"id": 3,"location": "5,3","direction": "horizontal","word": "SHOES","attempts": []},{"id": 4,"location": "5,7","direction": "vertical","word": "SHIRT","attempts": []},{"id": 5,"location": "6,7","direction": "horizontal","word": "HAT","attempts": []},{"id": 6,"location": "4,9","direction": "vertical","word": "PANTS","attempts": []}]}');
     loadNewPuzzle();
 }
@@ -447,26 +484,34 @@ function loadNewPuzzle() {
         fillTable();
         instantiateKeyboard();
 
+        let started = false;
         for (let i = 0; i < dataList.words.length; i++) {
-            for (let j = 0; j < dataList.words[i].length; j++) {
-                document.getElementById(getPos(dataList.words))
+            if (dataList.words[i].attempts.length > 0) {
+                started = true;
+                break;
+            }
+        }
+        if (!started)
+            return;
+
+        for (let i = 0; i < dataList.words.length; i++) {
+            for (let j = 0; j < dataList.words[i].word.length; j++) {
+                document.getElementById(getPos(dataList.words[i].id, j)).innerHTML = dataList.words[i].attempts[dataList.words[i].attempts.length - 1][j];
             }
         }
 
         updateColors();
     }
     catch {
-        console.error("Error loading new puzzle")
+        console.error("Error loading new puzzle");
     }
 }
 
-function autocomplete() {
+async function autocomplete() {
     for (let i = 0; i < dataList.words.length; i++) {
         selectWord(dataList.words[i].id);
-        for (let j = 0; j < dataList.words[i].word.length; j++) {
-            processInput(dataList.words[i].word[j]);
-        }
-        wordleEnter();
+        enterString(dataList.words[i].word);
+        await new Promise((resolve) => setTimeout(resolve, 500));
     }
 }
 
@@ -488,11 +533,11 @@ const downloadToFile = (content, filename, contentType) => {
 
 function finishGame() {
     let name = "Null";
+    let scores = localStorage.getItem("crossWordleScores").split(",");
     if (pointsValue > document.getElementById("letters5").innerHTML * 1)
         name = prompt("Congrats, you're on the leaderboard! What is your name?");
     else
-        scores.push(prompt("What is your name?"));
-    let scores = localStorage.getItem("crossWordleScores").split(",");
+        name = (prompt("What is your name?"));
     scores.push(pointsValue + "");
     scores.push(name);
     localStorage.setItem("crossWordleScores", scores);
