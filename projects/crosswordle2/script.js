@@ -165,10 +165,10 @@ function unhighlightWord(id) {
 }
 
 var pointsValue = 0, done = false;
-function updateColors() {
+function updateColors() { // Update the color of every letter tile
     // Uses the array of attempts
-    for (let i = 0; i < dataList.words.length; i++) {
-        if (dataList.words[i].attempts.length <= 0)
+    for (let i = 0; i < dataList.words.length; i++) { // For each word in the puzzle file
+        if (dataList.words[i].attempts.length <= 0) // Ensures that there are remaining attempts on the word
             continue;
         let colors = checkGuess(i, dataList.words[i].attempts[dataList.words[i].attempts.length - 1]);
         for (let j = 0; j < dataList.words[i].word.length; j++) {
@@ -210,41 +210,51 @@ function updateColors() {
     }
 }
 
+// Returns an array of colors for a guess on a given word
 function checkGuess(wordId, guess) {
-    let arr = [];
-    let word = dataList.words[wordId].word;
-    let letters = [];
-    let lettersFound = [];
+    let arr = []; // Array of colors
+    let word = dataList.words[wordId].word; // Current word
+    let letters = []; // Count of each letter in the word
+    let lettersFound = []; // Cound of how many of each letter the guess contains
 
+    // Fill the arrays from 65 (the ascii value for 'a') to 90 (the ascii value for 'z')
     for (let i = 65; i <= 90; i++) {
-        letters[i] = 0;
+        letters[i] = 0; // Set the count to zero
         lettersFound[i] = 0;
     }
-    for (let i = 0; i < word.length; i++) {
+
+    // Count each letter in the word
+    for (let i = 0; i < word.length; i++)
         letters[word[i].charCodeAt()]++;
-    }
 
-    for (let i = 0; i < word.length; i++) { // Count all correct letters first
-        if (guess[i] == word[i]) {
-            lettersFound[guess[i].charCodeAt()]++;
-            arr[i] = green;
+    // Correct letters are prioritized
+    for (let i = 0; i < word.length; i++) { // For each letter in the word
+        if (guess[i] == word[i]) { // If letters match
+            lettersFound[guess[i].charCodeAt()]++; // Add one to the count of that letter
+            arr[i] = green; // The letter is correct
         }
     }
+
     for (let i = 0; i < word.length; i++) { // Count all other letters after
-        if (guess[i] == word[i])
-            continue;
-        else if (word.indexOf(guess[i]) > -1) {
-            lettersFound[guess[i].charCodeAt()]++;
+        if (guess[i] == word[i]) // If letters match,
+            continue; // Skip this time because they were already checked
+
+        else if (word.indexOf(guess[i]) > -1) { // If the letter is in the word
+            lettersFound[guess[i].charCodeAt()]++; // Add one to the count of that letter
+
+            // If the amount of the letter is greater in the guess than in the word:
             if (lettersFound[guess[i].charCodeAt()] > letters[guess[i].charCodeAt()])
-                arr[i] = (red)
+                arr[i] = (red); // The letter is incorrect
+
             else
-                arr[i] = (orange);
+                arr[i] = (orange); // The letter is in the word somewhere
         }
-        else
-            arr[i] = (red);
+
+        else // If the letter is not in the word
+            arr[i] = (red); // The letter is incorrect
     }
 
-    return arr;
+    return arr; // Return the array of colors to be used when displaying the guess
 }
 
 var selectedWordId = null;
