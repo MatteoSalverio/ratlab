@@ -357,9 +357,10 @@ function spellCheck(string) {
         .then(data => {
             const wordList = data.split('\n');
             const sanitizedLine = string.trim().toLowerCase();
-            console.log("Word Checked: " + sanitizedLine);
-            console.log("'hat' as written in words.txt: " + wordList[168160 - 1]);
+            console.log("Word Checked: '" + sanitizedLine + "'");
+            console.log("'hat' as written in words.txt: '" + wordList[168160 - 1] + "'");
             console.log("Result: " + wordList.includes(sanitizedLine + "\r"));
+            console.log("Result 2: " + wordList.includes(sanitizedLine));
             return wordList.includes(sanitizedLine + "\r");
         })
         .catch(error => {
