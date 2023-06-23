@@ -358,8 +358,8 @@ function spellCheck(string) {
             const wordList = data.split('\n');
             const sanitizedLine = string.trim().toLowerCase();
             console.log(sanitizedLine);
-            console.log(wordList[wordList.indexOf(sanitizedLine)]);
-            return wordList.includes(sanitizedLine + "\r");
+            console.log(wordList[168160 - 1]);
+            return wordList.includes(sanitizedLine/* + "\r"*/);
         })
         .catch(error => {
             console.error('Error:', error);
