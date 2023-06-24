@@ -3,6 +3,7 @@ const wordle = document.getElementById("wordle");
 const wordleTable = document.getElementById("wordleTable");
 const menu = document.getElementById("menu");
 const keyboard = document.getElementById("keyboard");
+const hintDisplay = document.getElementById("hint");
 const scoreDisplay = document.getElementById("score");
 const red = "rgb(255, 75, 75)", green = "rgb(108, 255, 89)", orange = "rgb(255, 195, 74)";
 var activeWordle = false;
@@ -11,7 +12,8 @@ var dataList = "";
 const puzzleFile = document.getElementById("puzzleFile");
 
 var settings = {
-    spellCheck: true
+    spellCheck: true,
+    hints: true
 }
 
 function resetData() {
@@ -276,6 +278,14 @@ function showWordleTable(wordId) {
 
     resetKeyboard();
 
+    let hint = dataList.words[wordId].hint;
+    if (hint != undefined && hint != "undefined" && hint != null && hint != "" && settings.hints)
+        hintDisplay.innerHTML = hint;
+    else if (!settings.hints)
+        hintDisplay.innerHTML = "Hints are disabled.";
+    else
+        hintDisplay.innerHTML = "No hint provided.";
+
     wordleTable.innerHTML = "";
     for (let i = 0; i < dataList.words[wordId].word.length + 1; i++) {
         wordleTable.innerHTML += "<tr id='wordleTableRow" + i + "'></tr>"
@@ -441,10 +451,10 @@ function enterString(string) {
     processInput("ENTER");
 }
 
-const puzzles = ["clothing", "recreation", "word"];
+const puzzles = ["clothing", "recreation", "FBLA", "extreme"];
 const puzzleName = puzzles[Math.floor(Math.random() * puzzles.length)];
 //const puzzleName = "word";
-function onlineStart() { //For if the site is on a server (or VSCode Live Server)
+function onlineStart() { // For if the site is on a server (or VSCode Live Server)
     fetch('puzzles/' + puzzleName + '.json')
         .then(response => response.text())
         .then(data => {
@@ -452,7 +462,7 @@ function onlineStart() { //For if the site is on a server (or VSCode Live Server
             loadNewPuzzle();
         })
         .catch(err => {
-            //console.error(err)
+            // console.error(err)
             console.clear();
             console.error("Error: Cannot Access Online Puzzles");
             alert("NOTICE: CrossWordle is meant to be run on an online website. CrossWordle will now run in offline mode")

@@ -11,6 +11,7 @@ var selectedSpace = null;
 const sizeInput = document.getElementById("size");
 const locationInput = document.getElementById("location");
 const wordInput = document.getElementById("word");
+const hintInput = document.getElementById("hint");
 const directionInput = document.getElementById("direction");
 const puzzleFile = document.getElementById("puzzleFile");
 
@@ -55,6 +56,7 @@ function getPos(index) {
 
 function addWord() {
     let word = wordInput.value.toUpperCase();
+    let hint = hintInput.value;
     for (let i = 0; i < word.length; i++) {
         let space = null;
         space = document.getElementById(getPos(i)[0] + "," + getPos(i)[1]);
@@ -67,7 +69,8 @@ function addWord() {
         "location": locationInput.value,
         "direction": directionInput.innerHTML.toLowerCase(),
         "word": word,
-        "attempts": []
+        "attempts": [],
+        "hint": hint,
     };
     dataList.words.push(wordObj);
     wordInput.value = "";
