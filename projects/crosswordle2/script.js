@@ -12,7 +12,7 @@ var dataList = "";
 const puzzleFile = document.getElementById("puzzleFile");
 
 var settings = {
-    spellCheck: true,
+    spellcheck: true,
     hints: true
 }
 
@@ -191,8 +191,13 @@ function updateColors() { // Update the color of every letter tile
             document.getElementById(getPos(dataList.words[i].id, j)[0] + "," + getPos(dataList.words[i].id, j)[1]).style.backgroundColor = colors[j];
         }
         for (let j = 0; j < colors.length; j++) {
-            if (colors[j] == green)
+            if (colors[j] == green) {
                 points += 5;
+                if (!settings.spellcheck)
+                    points -= 1;
+                if (!settings.hints)
+                    points += 1;
+            }
             else if (colors[j] == orange)
                 points += 1;
         }
@@ -405,7 +410,7 @@ function wordleEnter() {
     if (guess.length < dataList.words[selectedWordId].word.length)
         return;
 
-    if (settings.spellCheck) {
+    if (settings.spellcheck) {
         spellCheck(guess.toLowerCase())
             .then(result => {
                 if (!result) {
@@ -470,7 +475,7 @@ function onlineStart() { // For if the site is on a server (or VSCode Live Serve
         });
 }
 function offlineStart() {
-    settings.spellCheck = false;
+    settings.spellcheck = false;
     dataList = JSON.parse('{"size": 11,"words": [{"id": 0,"location": "1,3","direction": "horizontal","word": "JACKET","attempts": []},{"id": 1,"location": "1,3","direction": "vertical","word": "JEANS","attempts": []},{"id": 2,"location": "3,1","direction": "horizontal","word": "FLANNEL","attempts": []},{"id": 3,"location": "5,3","direction": "horizontal","word": "SHOES","attempts": []},{"id": 4,"location": "5,7","direction": "vertical","word": "SHIRT","attempts": []},{"id": 5,"location": "6,7","direction": "horizontal","word": "HAT","attempts": []},{"id": 6,"location": "4,9","direction": "vertical","word": "PANTS","attempts": []}]}');
     loadNewPuzzle();
 }
@@ -536,6 +541,8 @@ async function autocomplete() {
         selectWord(dataList.words[i].id);
         enterString(dataList.words[i].word);
         await new Promise((resolve) => setTimeout(resolve, 500));
+        closeWordleTable();
+        await new Promise((resolve) => setTimeout(resolve, 500));
     }
 }
 
@@ -567,4 +574,15 @@ function finishGame() {
     localStorage.setItem("crossWordleScores", scores);
     fillBoard();
     togglePopup('leaderboards');
+}
+
+let settingsChecks = document.getElementsByClassName("settingsCheck");
+for (let i = 0; i < settingsChecks.length; i++) {
+    settingsChecks[i].addEventListener("change", function (event) {
+        let check = document.getElementById(event.target.id);
+        if (check.checked)
+            settings[event.target.id.toLowerCase()] = true;
+        else
+            settings[event.target.id.toLowerCase()] = false;
+    });
 }
