@@ -13,7 +13,8 @@ const puzzleFile = document.getElementById("puzzleFile");
 
 var settings = {
     spellcheck: true,
-    hints: true
+    hints: true,
+    colorful: false
 }
 
 function resetData() {
@@ -156,8 +157,9 @@ function getWordSpaces(id) {
 
 function highlightWord(id) {
     let wordSpaces = getWordSpaces(id);
-    for (let i = 0; i < wordSpaces.length; i++)
+    for (let i = 0; i < wordSpaces.length; i++) {
         wordSpaces[i].style.filter = "brightness(130%)";
+    }
 }
 
 function unhighlightWord(id) {
@@ -169,13 +171,51 @@ function unhighlightWord(id) {
 var pointsValue = 0, done = false;
 function updateColors() { // Update the color of every letter tile
     // Uses the array of attempts
+    let o = 0.6, c = 0, d = true;
+    let wordColors = [
+        "rgba(155, 35, 53, " + o + ")",
+        "rgba(221, 65, 36, " + o + ")",
+        "rgba(239, 192, 80, " + o + ")",
+        "rgba(136, 176, 75, " + o + ")",
+        "rgba(146, 168, 209, " + o + ")",
+        "rgba(181, 101, 167, " + o + ")",
+        "rgba(214, 80, 118, " + o + ")",
+        "rgba(91, 94, 166, " + o + ")",
+        "rgba(85, 180, 176, " + o + ")",
+        "rgba(0, 155, 119, " + o + ")"
+    ];
     for (let i = 0; i < dataList.words.length; i++) { // For each word in the puzzle file
-        if (dataList.words[i].attempts.length <= 0) // Ensures that there are remaining attempts on the word
+        if (dataList.words[i].attempts.length <= 0) { // Ensures that the word has been attempted
+            if (settings.colorful) {
+                for (let j = 0; j < dataList.words[i].word.length; j++) {
+                    let s = document.getElementById(getPos(i, j)[0] + "," + getPos(i, j)[1]);
+                    if (s.style.backgroundColor != "") {
+                        if (s.style.backgroundColor == red || s.style.backgroundColor == green || s.style.backgroundColor == orange)
+                            continue;
+                        else
+                            s.style.backgroundColor = getColorBetween(wordColors[c], s.style.backgroundColor); // Makes the intersection points a mixture of the two colors
+                    }
+                    else
+                        s.style.backgroundColor = wordColors[c];
+                }
+                if (c >= wordColors.length - 1)
+                    d = false;
+                else if (c <= 0)
+                    d = true;
+                if (d)
+                    c++;
+                else
+                    c--;
+            }
+            else {
+                for (let j = 0; j < dataList.words[i].word.length; j++)
+                    document.getElementById(getPos(i, j)[0] + "," + getPos(i, j)[1]).style.backgroundColor = "rgb(185, 185, 185)";
+            }
             continue;
-        let colors = checkGuess(i, dataList.words[i].attempts[dataList.words[i].attempts.length - 1]);
-        for (let j = 0; j < dataList.words[i].word.length; j++) {
-            document.getElementById(getPos(i, j)[0] + "," + getPos(i, j)[1]).style.backgroundColor = colors[j];
         }
+        let colors = checkGuess(i, dataList.words[i].attempts[dataList.words[i].attempts.length - 1]);
+        for (let j = 0; j < dataList.words[i].word.length; j++)
+            document.getElementById(getPos(i, j)[0] + "," + getPos(i, j)[1]).style.backgroundColor = colors[j];
     }
 
     let points = 0;
@@ -215,6 +255,18 @@ function updateColors() { // Update the color of every letter tile
         done = true;
         finishGame();
     }
+}
+
+function getColorBetween(color1, color2) { // Takes two RGB or RGBA colors and returns the color between them
+    let c1 = color1.replace("rgba", "").replace("rgb", "").replace("(", "").replace(")", "").replace(" ", "").split(",");
+    let c2 = color2.replace("rgba", "").replace("rgb", "").replace("(", "").replace(")", "").replace(" ", "").split(",");
+    let between = [
+        Math.round((c1[0] * 1 + c2[0] * 1) / 2),
+        Math.round((c1[1] * 1 + c2[1] * 1) / 2),
+        Math.round((c1[2] * 1 + c2[2] * 1) / 2),
+        (c1[3] * 1 + c1[3] * 1) / 2
+    ];
+    return "rgba(" + between[0] + "," + between[1] + "," + between[2] + "," + between[3] + ")";
 }
 
 // Returns an array of colors for a guess on a given word
@@ -456,7 +508,7 @@ function enterString(string) {
     processInput("ENTER");
 }
 
-const puzzles = ["clothing", "recreation", "FBLA", "extreme"];
+const puzzles = ["clothing", "recreation", "FBLA", "extreme", "generated"];
 const puzzleName = puzzles[Math.floor(Math.random() * puzzles.length)];
 //const puzzleName = "word";
 function onlineStart() { // For if the site is on a server (or VSCode Live Server)
@@ -506,12 +558,16 @@ function onReaderLoad(event) {
         alert("ERROR: The file you have uploaded is not a Cross Wordle Puzzle!");
     }
 }
+async function wait(milliseconds) {
+    await new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
 function loadNewPuzzle() {
     try {
         mainTable.innerHTML = "";
         instantiateTable(dataList.size);
         fillTable();
         instantiateKeyboard();
+        updateColors();
 
         let started = false;
         for (let i = 0; i < dataList.words.length; i++) {
@@ -520,6 +576,7 @@ function loadNewPuzzle() {
                 break;
             }
         }
+
         if (!started)
             return;
 
@@ -584,5 +641,6 @@ for (let i = 0; i < settingsChecks.length; i++) {
             settings[event.target.id.toLowerCase()] = true;
         else
             settings[event.target.id.toLowerCase()] = false;
+        updateColors();
     });
 }
