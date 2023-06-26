@@ -528,7 +528,15 @@ function onlineStart() { // For if the site is on a server (or VSCode Live Serve
 }
 function offlineStart() {
     settings.spellcheck = false;
-    dataList = JSON.parse('{"size": 11,"words": [{"id": 0,"location": "1,3","direction": "horizontal","word": "JACKET","attempts": []},{"id": 1,"location": "1,3","direction": "vertical","word": "JEANS","attempts": []},{"id": 2,"location": "3,1","direction": "horizontal","word": "FLANNEL","attempts": []},{"id": 3,"location": "5,3","direction": "horizontal","word": "SHOES","attempts": []},{"id": 4,"location": "5,7","direction": "vertical","word": "SHIRT","attempts": []},{"id": 5,"location": "6,7","direction": "horizontal","word": "HAT","attempts": []},{"id": 6,"location": "4,9","direction": "vertical","word": "PANTS","attempts": []}]}');
+    document.getElementById("spellcheck").checked = false;
+    document.getElementById("spellcheckContainer").style.color = red;
+    document.getElementById("spellcheckContainer").style.opacity = "0.5";
+    let pzs = [
+        '{"size":10,"words":[{"id":0,"location":"2,1","direction":"horizontal","word":"FUTURE","attempts":[],"hint":"A later date"},{"id":1,"location":"1,2","direction":"vertical","word":"BUSINESS","attempts":[],"hint":"Not a casual enviornment"},{"id":2,"location":"6,1","direction":"horizontal","word":"LEADERS","attempts":[],"hint":"People who can direct others well"},{"id":3,"location":"1,6","direction":"vertical","word":"NETWORK","attempts":[],"hint":"Create connections with others"},{"id":4,"location":"4,1","direction":"horizontal","word":"TIME","attempts":[],"hint":"What a clock tells"},{"id":5,"location":"1,4","direction":"vertical","word":"JUNE","attempts":[],"hint":"When the FBLA National Leadership Conference takes place"}]}',
+        '{"size":10,"words":[{"id":"0","location":"2,1","direction":"horizontal","word":"PROGRAM","attempts":[],"hint":"Another word  for code"},{"id":"1","location":"1,3","direction":"vertical","word":"CONSTANT","attempts":[],"hint":"Never changing"},{"id":"2","location":"2,5","direction":"vertical","word":"RANDOM","attempts":[],"hint":"Does not obey a pattern"},{"id":"3","location":"5,1","direction":"horizontal","word":"DATED","attempts":[],"hint":"Another word for old"},{"id":"4","location":"7,3","direction":"horizontal","word":"NAME","attempts":[],"hint":"A type of identifier"}]}',
+        '{"size":11,"words":[{"id":0,"location":"1,3","direction":"horizontal","word":"JACKET","attempts":[],"hint":"For colder weather"},{"id":1,"location":"1,3","direction":"vertical","word":"JEANS","attempts":[],"hint":"Legwear"},{"id":2,"location":"3,1","direction":"horizontal","word":"FLANNEL","attempts":[],"hint":"Stylish outer clothing"},{"id":3,"location":"5,3","direction":"horizontal","word":"SHOES","attempts":[],"hint":"For your feet"},{"id":4,"location":"5,7","direction":"vertical","word":"SHIRT","attempts":[],"hint":"Key part of an outfit"},{"id":5,"location":"6,7","direction":"horizontal","word":"HAT","attempts":[],"hint":"Wear this on your head"},{"id":6,"location":"3,9","direction":"vertical","word":"PANTS","attempts":[],"hint":"Wear this on your legs"}]}',
+    ];
+    dataList = JSON.parse(pzs[Math.floor(Math.random() * pzs.length)]);
     loadNewPuzzle();
 }
 
