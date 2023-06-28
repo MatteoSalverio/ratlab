@@ -14,27 +14,36 @@ const puzzleFile = document.getElementById("puzzleFile");
 var settings = {
     spellcheck: true,
     hints: true,
-    colorful: false
+    colorful: false,
+    demo: "false"
 }
 
+// Local Storage Data Management:
 function resetData() { // Resets all localstorage data to default
     localStorage.setItem('crossWordleScores', [[0, 'Empty'], [0, 'Empty'], [0, 'Empty'], [0, 'Empty'], [0, 'Empty']]);
     localStorage.setItem('crossWordleNewUser', 'true');
     location.reload();
 }
 
-if (localStorage.getItem('crossWordleScores') == null)
+if (localStorage.getItem('crossWordleScores') == null) // Leaderboards scores
     localStorage.setItem('crossWordleScores', [[0, 'Empty'], [0, 'Empty'], [0, 'Empty'], [0, 'Empty'], [0, 'Empty']]);
 else {
     fillBoard();
 }
 
-if (localStorage.getItem('crossWordleNewUser') == null)
+if (localStorage.getItem('crossWordleDemoMode') == null) // Demo mode for presentation
+    localStorage.setItem('crossWordleDemoMode', "false");
+else {
+    settings.demo = localStorage.getItem('crossWordleDemoMode');
+    if (settings.demo == true || settings.demo == "true")
+        console.log("Demo mode active");
+}
+
+if (localStorage.getItem('crossWordleNewUser') == null) // Whether the player has played before
     localStorage.setItem('crossWordleNewUser', 'true');
-//if (localStorage.getItem('crossWordleNewUser') == 'true') {
 togglePopup('howToPlay');
-//localStorage.setItem('crossWordleNewUser', 'false');
-//}
+
+// Main game logic:
 function fillBoard() { // Populates leaderboard with player scores
     let scores = localStorage.getItem("crossWordleScores").split(",");
     let scoresArr = [], tempArr = [];
@@ -243,7 +252,7 @@ function updateColors() { // Update the color of every letter tile
         }
     }
     pointsValue = points;
-    setPoints();
+    setPoints(points);
 
     let finished = true;
     for (let i = 0; i < dataList.words.length; i++) {
@@ -257,7 +266,7 @@ function updateColors() { // Update the color of every letter tile
     }
 }
 
-async function setPoints() { // Adds points to the score display
+async function setPoints(points) { // Adds points to the score display
     let oldPoints = scoreDisplay.innerHTML.replace("Score: ", "") * 1;
     while (pointsValue > oldPoints) {
         oldPoints++;
@@ -528,7 +537,9 @@ function enterString(string) {
 }
 
 const puzzles = ["clothing", "recreation", "FBLA", /*"extreme",*/ "generated"];
-const puzzleName = puzzles[Math.floor(Math.random() * puzzles.length)];
+var puzzleName = puzzles[Math.floor(Math.random() * puzzles.length)];
+if (settings.demo == "true")
+    puzzleName = "FBLA";
 //const puzzleName = "word";
 function onlineStart() { // For if the site is on a server (or VSCode Live Server)
     fetch('puzzles/' + puzzleName + '.json')
@@ -670,4 +681,16 @@ for (let i = 0; i < settingsChecks.length; i++) {
             settings[event.target.id.toLowerCase()] = false;
         updateColors();
     });
+}
+
+function toggleDemo() {
+    if (settings.demo == "true") {
+        settings.demo = "false";
+        console.log("Demo mode inactive");
+    }
+    else {
+        settings.demo = "true";
+        console.log("Demo mode active");
+    }
+    localStorage.setItem('crossWordleDemoMode', settings.demo);
 }
