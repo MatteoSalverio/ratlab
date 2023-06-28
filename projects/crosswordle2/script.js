@@ -31,10 +31,10 @@ else {
 
 if (localStorage.getItem('crossWordleNewUser') == null)
     localStorage.setItem('crossWordleNewUser', 'true');
-if (localStorage.getItem('crossWordleNewUser') == 'true') {
-    togglePopup('howToPlay');
-    localStorage.setItem('crossWordleNewUser', 'false');
-}
+//if (localStorage.getItem('crossWordleNewUser') == 'true') {
+togglePopup('howToPlay');
+//localStorage.setItem('crossWordleNewUser', 'false');
+//}
 function fillBoard() {
     let scores = localStorage.getItem("crossWordleScores").split(",");
     let scoresArr = [], tempArr = [];
@@ -243,7 +243,7 @@ function updateColors() { // Update the color of every letter tile
         }
     }
     pointsValue = points;
-    scoreDisplay.innerHTML = "Score: " + points;
+    setPoints();
 
     let finished = true;
     for (let i = 0; i < dataList.words.length; i++) {
@@ -255,6 +255,16 @@ function updateColors() { // Update the color of every letter tile
         done = true;
         finishGame();
     }
+}
+
+async function setPoints() { // Adds points to the score display
+    let oldPoints = scoreDisplay.innerHTML.replace("Score: ", "") * 1;
+    while (pointsValue > oldPoints) {
+        oldPoints++;
+        scoreDisplay.innerHTML = "Score: " + oldPoints;
+        await new Promise((resolve) => setTimeout(resolve, 25));
+    }
+    scoreDisplay.innerHTML = "Score: " + points;
 }
 
 function getColorBetween(color1, color2) { // Takes two RGB or RGBA colors and returns the color between them
@@ -396,11 +406,11 @@ const keys = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "
 document.addEventListener("keydown", function (e) {
     if (!activeWordle) {
         if (e.key == "Escape")
-        finishGame();
+            finishGame();
         return;
     }
     let k = e.key.toUpperCase();
-    if (k == "ENTER") {
+    if (k == "ESCAPE") {
         closeWordleTable();
         return;
     }
@@ -516,8 +526,8 @@ function enterString(string) {
 }
 
 const puzzles = ["clothing", "recreation", "FBLA", "extreme", "generated"];
-const puzzleName = puzzles[Math.floor(Math.random() * puzzles.length)];
-//const puzzleName = "word";
+//const puzzleName = puzzles[Math.floor(Math.random() * puzzles.length)];
+const puzzleName = "word";
 function onlineStart() { // For if the site is on a server (or VSCode Live Server)
     fetch('puzzles/' + puzzleName + '.json')
         .then(response => response.text())
