@@ -35,7 +35,7 @@
         <button id="closeWordButton" onclick="closeWordleTable()">Close Word</button>
     </div>
 
-    <div class="popup" id="leaderboards" style="display: none;">
+    <div class="popup" id="leaderboards" style="display: none; width: 80%; max-width: 500px;">
         <h3 style="float: left; margin: 10px 20px; text-decoration: underline;">Leaderboard</h3>
         <button class="exitButton" onclick="togglePopup('leaderboards')">X</button>
         <table id="leaderboardsTable">
@@ -65,12 +65,12 @@
             </tr>
         </table>
     </div>
-    <div class="popup" id="howToPlay" style="display: none; width: 70%; max-width: 500px; height: 70%;">
+    <div class="popup" id="howToPlay" style="display: none; width: 70%; max-width: 500px; height: 75%;">
         <h3 style="float: left; margin: 10px 20px; text-decoration: underline; color: rgb(108, 255, 89);">Welcome to
             Cross Wordle!</h3>
         <button class="exitButton" onclick="togglePopup('howToPlay')">X</button>
         <br><br>
-        <div style="text-align: left; margin: 20px; overflow: scroll; height: 65%;">
+        <div style="text-align: left; margin: 20px; overflow: scroll; height: 78%;">
             <h4 style="margin: 0;">How to Play:</h4>
             <ul style="overflow: scroll;">
                 <li>Click on a <span style="color: aliceblue;">row or column</span> to select the word</li>
@@ -80,17 +80,17 @@
                 <li><span style="color: rgb(108, 255, 89); font-weight: bold;;">Green</span> letters are correct and
                     worth 5
                     points.</li>
-                <br>
                 <li><span style="color: rgb(255, 195, 74); font-weight: bold;">Orange</span> letters are in the word,
                     but not where you put
                     them. These are worth 1 point.</li>
-                <br>
                 <li><span style="color: tomato; font-weight: bold;">Red</span> letters are not in the word, and give no
                     points</li>
                 <br>
                 <li>Make sure to work on other words when you get stuck!</li>
                 <br>
                 <li>Click <span style="font-style: italic;">'Finish Game'</span> or press Escape when you are done</li>
+                <br>
+                <li>Open <span style="font-style: italic; cursor: pointer;" onclick="togglePopup('settings')">Settings</span> to change the appearance and </li>
             </ul>
             <button onclick="togglePopup('howToPlay')"
                 style="position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%);">Play</button>
