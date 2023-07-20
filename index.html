@@ -68,13 +68,7 @@
     <button id="enter">Enter</button>
     <br><br>
     <div id="projectList">
-        <ul>
-            <li><a href="projects/crosswordles/">crosswordles</a></li>
-            <li><a href="projects/crosswordle2/">crosswordle2</a></li>
-            <li><a href="projects/cookieGame/">cookieGame</a></li>
-            <li><a href="projects/craftingTool/">craftingTool</a></li>
-            <li><a href="projects/endian/">endian</a></li>
-        </ul>
+        <ul id="projects"></ul>
     </div>
     <br><br>
     <a href="https://ratlab.one" style="font-size: 18px;">Return to The Rat Lab</a>
@@ -91,6 +85,15 @@
             window.open("https://matteosalverio.github.io/ratlab/projects/" + document.getElementById("projectId").value, "_new");
             document.getElementById("projectId").value = "";
         }
+        var projects = [
+            "crosswordles", "crosswordle2", "cookieGame", "craftingTool", "endian", "flappyBird", "pacRat", "platformer", "ratGpt", "ratGui", "RatLabRewritten", "ratRpg", "ratType", "snake", "snakeUltraviolet", "solidworks", "vcpu"
+        ];
+        function loadProjects() {
+            for (let i = 0; i < projects.length; i++) {
+                document.getElementById("projects").innerHTML += "<li><a href='projects/" + projects[i] + "/'>" + projects[i] + "</a></li>";
+            }
+        }
+        loadProjects();
     </script>
 </body>
 
