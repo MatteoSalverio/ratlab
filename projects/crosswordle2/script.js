@@ -1,41 +1,50 @@
-const mainTable = document.getElementById("mainTable");
-const wordle = document.getElementById("wordle");
-const wordleTable = document.getElementById("wordleTable");
-const menu = document.getElementById("menu");
-const keyboard = document.getElementById("keyboard");
-const hintDisplay = document.getElementById("hint");
-const scoreDisplay = document.getElementById("score");
-const red = "rgb(255, 75, 75)", green = "rgb(108, 255, 89)", orange = "rgb(255, 195, 74)";
-var activeWordle = false;
-var dataList = "";
+const mainTable = document.getElementById("mainTable"); // Grid of letter spaces
+const wordle = document.getElementById("wordle"); // Wordle Panel
+const wordleTable = document.getElementById("wordleTable"); // Wordle table letter spaces
+const menu = document.getElementById("menu"); // Buttons at the bottom
+const keyboard = document.getElementById("keyboard"); // On-screen keyboard
+const hintDisplay = document.getElementById("hint"); // Hint provided in the wordle panel
+const scoreDisplay = document.getElementById("score"); // Score display at the top left
+const red = "rgb(255, 75, 75)", green = "rgb(108, 255, 89)", orange = "rgb(255, 195, 74)"; // Color presets
+var activeWordle = false; // Whether the player is working on a word
+var dataList = ""; // All save/game data
 
 const puzzleFile = document.getElementById("puzzleFile");
 
 var settings = {
     spellcheck: true,
     hints: true,
-    colorful: false
+    colorful: false,
+    demo: "false"
 }
 
-function resetData() {
+// Local Storage Data Management:
+function resetData() { // Resets all localstorage data to default
     localStorage.setItem('crossWordleScores', [[0, 'Empty'], [0, 'Empty'], [0, 'Empty'], [0, 'Empty'], [0, 'Empty']]);
     localStorage.setItem('crossWordleNewUser', 'true');
     location.reload();
 }
 
-if (localStorage.getItem('crossWordleScores') == null)
+if (localStorage.getItem('crossWordleScores') == null) // Leaderboards scores
     localStorage.setItem('crossWordleScores', [[0, 'Empty'], [0, 'Empty'], [0, 'Empty'], [0, 'Empty'], [0, 'Empty']]);
 else {
     fillBoard();
 }
 
-if (localStorage.getItem('crossWordleNewUser') == null)
-    localStorage.setItem('crossWordleNewUser', 'true');
-if (localStorage.getItem('crossWordleNewUser') == 'true') {
-    togglePopup('howToPlay');
-    localStorage.setItem('crossWordleNewUser', 'false');
+if (localStorage.getItem('crossWordleDemoMode') == null) // Demo mode for presentation
+    localStorage.setItem('crossWordleDemoMode', "false");
+else {
+    settings.demo = localStorage.getItem('crossWordleDemoMode');
+    if (settings.demo == true || settings.demo == "true")
+        console.log("Demo mode active");
 }
-function fillBoard() {
+
+if (localStorage.getItem('crossWordleNewUser') == null) // Whether the player has played before
+    localStorage.setItem('crossWordleNewUser', 'true');
+togglePopup('howToPlay');
+
+// Main game logic:
+function fillBoard() { // Populates leaderboard with player scores
     let scores = localStorage.getItem("crossWordleScores").split(",");
     let scoresArr = [], tempArr = [];
     for (let i = 0; i < scores.length; i++) {
@@ -52,7 +61,7 @@ function fillBoard() {
     }
 }
 
-function instantiateTable(size) {
+function instantiateTable(size) { // Creates the main grid
     for (let i = 0; i < size; i++) {
         mainTable.innerHTML += "<tr id='mainTableRow" + i + "'></tr>"
         for (let j = 0; j < size; j++) {
@@ -62,7 +71,7 @@ function instantiateTable(size) {
     }
 }
 
-function instantiateKeyboard() {
+function instantiateKeyboard() { // Creates the on-screen keyboard
     keyboard.innerHTML = "";
     let keys = "QWERTYUIOPASDFGHJKL1ZXCVBNM2";
     let index = 0;
@@ -94,14 +103,14 @@ function instantiateKeyboard() {
         });
     }
 }
-function resetKeyboard() {
+function resetKeyboard() { // Removes word-specific styling from the keyboard
     let keyButtons = document.getElementsByClassName("key");
     for (let i = 0; i < keyButtons.length; i++) {
         keyButtons[i].style.backgroundColor = "lightgray";
     }
 }
 
-function getPos(id, index) {
+function getPos(id, index) { // Returns position of a letter given it's wordId and index within the word
     let initialPos = dataList.words[id].location.split(",");
     let pos = initialPos;
     if (dataList.words[id].direction == "horizontal")
@@ -111,7 +120,7 @@ function getPos(id, index) {
     return pos;
 }
 
-function fillTable() {
+function fillTable() { // Populate the main grid with words
     for (let i = 0; i < dataList.words.length; i++) {
         for (let j = 0; j < dataList.words[i].word.length; j++) {
             let space = document.getElementById(getPos(i, j)[0] + "," + getPos(i, j)[1]);
@@ -147,7 +156,7 @@ function fillTable() {
     }
 }
 
-function getWordSpaces(id) {
+function getWordSpaces(id) { // Returns locations of all letters within a given word
     let arr = []
     for (let i = 0; i < dataList.words[id].word.length; i++) {
         arr.push(document.getElementById(getPos(id, i)[0] + "," + getPos(id, i)[1]));
@@ -243,7 +252,7 @@ function updateColors() { // Update the color of every letter tile
         }
     }
     pointsValue = points;
-    scoreDisplay.innerHTML = "Score: " + points;
+    setPoints(points);
 
     let finished = true;
     for (let i = 0; i < dataList.words.length; i++) {
@@ -255,6 +264,16 @@ function updateColors() { // Update the color of every letter tile
         done = true;
         finishGame();
     }
+}
+
+async function setPoints(points) { // Adds points to the score display
+    let oldPoints = scoreDisplay.innerHTML.replace("Score: ", "") * 1;
+    while (pointsValue > oldPoints) {
+        oldPoints++;
+        scoreDisplay.innerHTML = "Score: " + oldPoints;
+        await new Promise((resolve) => setTimeout(resolve, 25));
+    }
+    scoreDisplay.innerHTML = "Score: " + points;
 }
 
 function getColorBetween(color1, color2) { // Takes two RGB or RGBA colors and returns the color between them
@@ -319,7 +338,7 @@ function checkGuess(wordId, guess) {
 var selectedWordId = null;
 var column = 0;
 
-function selectWord(id) {
+function selectWord(id) { // Selects a word from it's ID
     if (dataList.words[id].word == dataList.words[id].attempts[dataList.words[id].attempts.length - 1])
         return;
     selectedWordId = id;
@@ -327,7 +346,7 @@ function selectWord(id) {
     column = 0;
 }
 
-function showWordleTable(wordId) {
+function showWordleTable(wordId) { // Displays the Wordle panel of a given word
     activeWordle = true;
     mainTable.style.display = "none";
     wordle.style.display = "inline";
@@ -375,7 +394,7 @@ function showWordleTable(wordId) {
     }
 }
 
-function closeWordleTable() {
+function closeWordleTable() { // Closes whatever Wordle panel is open
     activeWordle = false;
     mainTable.style.display = "inline";
     wordle.style.display = "none";
@@ -394,9 +413,18 @@ function closeWordleTable() {
 
 const keys = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "ENTER", "BACKSPACE"];
 document.addEventListener("keydown", function (e) {
-    if (!activeWordle)
+    if (!activeWordle) {
+        if (e.key == "Escape") {
+            if (confirm("Are you sure you want to finish?"))
+                finishGame();
+        }
         return;
+    }
     let k = e.key.toUpperCase();
+    if (k == "ESCAPE") {
+        closeWordleTable();
+        return;
+    }
     if (keys.indexOf(k) < 0)
         return;
 
@@ -406,7 +434,7 @@ document.addEventListener("keydown", function (e) {
     processInput(k);
 });
 
-function processInput(k) {
+function processInput(k) { // Sends key input or button input the the game
     if (dataList.words[selectedWordId].word == dataList.words[selectedWordId].attempts[dataList.words[selectedWordId].attempts.length - 1])
         return;
     if (k == "BACKSPACE") {
@@ -508,8 +536,10 @@ function enterString(string) {
     processInput("ENTER");
 }
 
-const puzzles = ["clothing", "recreation", "FBLA", "extreme", "generated"];
-const puzzleName = puzzles[Math.floor(Math.random() * puzzles.length)];
+const puzzles = ["clothing", "recreation", "FBLA", /*"extreme",*/ "generated"];
+var puzzleName = puzzles[Math.floor(Math.random() * puzzles.length)];
+if (settings.demo == "true")
+    puzzleName = "FBLA";
 //const puzzleName = "word";
 function onlineStart() { // For if the site is on a server (or VSCode Live Server)
     fetch('puzzles/' + puzzleName + '.json')
@@ -651,4 +681,16 @@ for (let i = 0; i < settingsChecks.length; i++) {
             settings[event.target.id.toLowerCase()] = false;
         updateColors();
     });
+}
+
+function toggleDemo() {
+    if (settings.demo == "true") {
+        settings.demo = "false";
+        console.log("Demo mode inactive");
+    }
+    else {
+        settings.demo = "true";
+        console.log("Demo mode active");
+    }
+    localStorage.setItem('crossWordleDemoMode', settings.demo);
 }

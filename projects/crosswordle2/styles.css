@@ -146,10 +146,17 @@ button:hover {
     color: black;
 }
 
+#leaderboardsTable th {
+    border-width: 5px;
+    border-color: rgb(7, 41, 39);
+    background-color: lightseagreen;
+}
+
 #leaderboardsTable td {
     border-style: solid;
     color: aliceblue;
-    border-width: 1px;
+    background-color: darkslategray;
+    border-width: 5px;
     padding: 5px;
     font-size: 20px;
     font-weight: 500;
