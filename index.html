@@ -40,7 +40,22 @@
         a {
             color: lightgreen;
             text-decoration: none;
-            font-size: 18px;
+        }
+
+        #projectList {
+            background-color: rgba(0, 0, 0, 0.25);
+            border-radius: 15px;
+            padding: 15px;
+            width: 50%;
+            margin: auto;
+        }
+
+        ul {
+            font-size: 24px;
+        }
+
+        li {
+            cursor: pointer;
         }
     </style>
 </head>
@@ -51,8 +66,18 @@
     <h2>Enter Project ID Here:</h2>
     <input id="projectId" type="text">
     <button id="enter">Enter</button>
-    <br><br><br><br>
-    <a href="https://ratlab.one">Return to The Rat Lab</a>
+    <br><br>
+    <div id="projectList">
+        <ul>
+            <li><a href="projects/crosswordles/">crosswordles</a></li>
+            <li><a href="projects/crosswordle2/">crosswordle2</a></li>
+            <li><a href="projects/cookieGame/">cookieGame</a></li>
+            <li><a href="projects/craftingTool/">craftingTool</a></li>
+            <li><a href="projects/endian/">endian</a></li>
+        </ul>
+    </div>
+    <br><br>
+    <a href="https://ratlab.one" style="font-size: 18px;">Return to The Rat Lab</a>
     <p style="position: absolute; bottom: 15px; left: 15px; margin: 0px;">Rat Lab 2023</p>
     <script>
         document.getElementById("enter").addEventListener("click", function () {
