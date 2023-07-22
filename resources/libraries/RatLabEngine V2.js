@@ -1,4 +1,4 @@
-// Rat Lab Engine - Copyright Rat Lab 2023
+// Rat Lab Engine Version 2 - Copyright Rat Lab 2024
 
 const canvas = document.getElementById("canvas"); // Canvas where game is displayed
 const ctx = canvas.getContext("2d");
@@ -13,8 +13,6 @@ setWindowSize();
 window.addEventListener('resize', setWindowSize());
 
 ctx.imageSmoothingEnabled = false; // Allows the game to be pixelated using nearest neighbor scaling
-
-var playerSpeed = 300;
 
 // Debug Variables
 var debug = {
@@ -57,6 +55,7 @@ class scene { // A scene is like an isolated game of it's own
         };
         this.objs = [];
         this.backgroundObjs = [];
+        this.textObjs = [];
         scenes.push(this);
     }
 }
@@ -105,7 +104,7 @@ class obj { // General class, mainly for inheritance
         if (this.colliderCheck('down') && this.forces.vertical > 0) { // Resets gravity when object touches the ground
             this.forces.vertical *= -0.2;
         }
-        else if (!this.colliderCheck('down') && (this.movable || this.index == player.index) && this.forces.vertical < 10)
+        else if (!this.colliderCheck('down') && (this.movable) && this.forces.vertical < 10)
             this.forces.vertical += this.scene.gravity;
 
         // Apply Horizontal Forces
@@ -223,7 +222,7 @@ class obj { // General class, mainly for inheritance
 
     applyForce(axis, magnitude) { // Applies a force to the object obeying the physics this.scene's ruleset
         magnitude *= 1;
-        if (!this.movable && this.index != player.index)
+        if (!this.movable)
             return;
         if (axis == 'horizontal')
             this.forces.horizontal += magnitude;
@@ -367,23 +366,48 @@ class backgroundTile { // Tiles that are rendered behind everything else and hav
     }
 }
 
+class textBox {
+    constructor(scene, isOverlay, x, y, w, h, text, textFont, textColor, backgroundColor, padding) {
+        this.scene = scene;
+        this.isOverlay = isOverlay;
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+        this.text = text;
+        this.textFont = textFont;
+        this.textColor = textColor;
+        this.backgroundColor = backgroundColor;
+        this.padding = padding;
+        this.scene.textObjs.push(this);
+    }
+
+    draw() {
+        if (this.isOverlay) {
+            ctx.fillStyle = this.backgroundColor;
+            ctx.fillRect(this.x, this.y, this.w, this.h);
+            ctx.font = this.textFont;
+            ctx.fillStyle = this.textColor;
+            ctx.fillText(this.text, this.x + this.padding - 5, this.y + this.h - this.padding, this.w - this.padding * 1.8);
+        }
+        else {
+            ctx.fillStyle = this.backgroundColor;
+            ctx.fillRect(this.x - this.scene.camera.x, this.y - this.scene.camera.y, this.w, this.h);
+            ctx.font = this.textFont;
+            ctx.fillStyle = this.textColor;
+            ctx.fillText(this.text, this.x + this.padding - 5 - this.scene.camera.x, this.y + this.h - this.padding - this.scene.camera.y, this.w - this.padding * 1.8);
+        }
+    }
+}
+
 let keys = []; // Array of all keys that have been pressed
 document.addEventListener('keydown', function (e) {
     let k = e.keyCode;
     keys[k] = true; // Sets the key to active in the array
-    if (keys[87] || keys[65] || keys[83] || keys[68]) // WASD Causes the player to move
-        player.moving = true;
 });
 document.addEventListener('keyup', function (e) {
     let k = e.keyCode;
     keys[k] = false;
-    player.moving = false; // Sets the key to inactive in the array
-    if (keys[87] || keys[65] || keys[83] || keys[68]) // WASD Causes the player to move
-        player.moving = true;
-    else { // Resets player's animation
-        player.moving = false;
-        player.animation.frame = 1;
-    }
 });
 function getKey(key) { // Returns the value of a specific key from the keys array
     if (key == "Space")
@@ -394,6 +418,14 @@ function getKey(key) { // Returns the value of a specific key from the keys arra
         return keys[16];
     else if (key == "Enter")
         return keys[13];
+    else if (key == "ArrowUp")
+        return keys[38];
+    else if (key == "ArrowDown")
+        return keys[40];
+    else if (key == "ArrowLeft")
+        return keys[37];
+    else if (key == "ArrowRight")
+        return keys[39];
     return keys[key.charCodeAt(0)];
 }
 
@@ -410,13 +442,13 @@ function redraw() {
     let sorted = sortByY(currentScene.objs); // Allows objects to be drawn in order of their y position to create a 3d effect
     for (let i = 0; i < sorted.length; i++) // Draws all objects
         sorted[i].draw();
+    for (let i = 0; i < currentScene.textObjs.length; i++) // Draws all objects
+        currentScene.textObjs[i].draw();
 }
 
 function animate() { // Plays animations for all objects
     ctx.clearRect(0, 0, canvas.width, canvas.height); // Clears all objects from the canvas
     for (let i = 0; i < currentScene.objs.length; i++) {
-        if (currentScene.objs[i].index == player.index && !player.moving)
-            continue;
         currentScene.objs[i].animate();
     }
 }
@@ -430,9 +462,9 @@ function createBoxOfTiles(scene, x, y, w, h, mass, tilePath, tileSize, tileResol
     }
 }
 
-function moveCameraToPlayer() { // Moves the camera to the player
-    currentScene.camera.x = player.x - canvas.width / 2 + player.w / 2 + currentScene.camera.offset.x;
-    currentScene.camera.y = player.y - canvas.height / 2 + player.h / 2 + currentScene.camera.offset.y;
+function moveCameraToObject(object) { // Moves the camera to the designated object
+    currentScene.camera.x = object.x - canvas.width / 2 + object.w / 2 + currentScene.camera.offset.x;
+    currentScene.camera.y = object.y - canvas.height / 2 + object.h / 2 + currentScene.camera.offset.y;
 }
 
 function update(delta) { }
@@ -453,7 +485,12 @@ function updateEngine(currentTime) {
 
     requestAnimationFrame(updateEngine);
 }
-requestAnimationFrame(updateEngine);
+
+async function start() { // Waits to start the code for 50 milliseconds
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    requestAnimationFrame(updateEngine);
+}
+start();
 
 setInterval(function () { // Animations run slower than the rest of the game, so they have their own function here
     animate();

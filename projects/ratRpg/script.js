@@ -1,7 +1,12 @@
 // Using Rat Lab V2 Engine
 
+// Title Screen:
+var titleScene = new scene("title");
+let titleText = new textBox(titleScene, true, canvas.width / 2 - 200 + 10, canvas.height * 0.2, 400, 45, "Rat Lab RPG", "64px sans-serif", "aliceblue", "rgba(256,256,256,0)", 10);
+
 var testScene = new scene("test");
 var testScene2 = new scene("test2");
+
 loadScene(testScene);
 
 // Create background
@@ -19,24 +24,35 @@ let b2 = new box(testScene, 100, 100, 40, 40, 0, "aqua", false);
 
 b.applyForce("horizontal", 5);
 
+let t = new textBox(testScene, false, -20, canvas.height * 0.7, 900, 100, "Hello, world! Welcome to the Rat Lab!", "48px sans-serif", "aliceblue", "rgba(256,256,256,0.1)", 20);
+let scoreDisplay = new textBox(testScene, true, 20, 20, 150, 45, "Score: 0pts", "32px sans-serif", "aliceblue", "rgba(256,256,256,0.1)", 10);
+
 function processMovement(delta) {
-    let speed = playerSpeed;
-    if (getKey("W")) {// W
+    let speed = 300; // Player speed
+    player.moving = false;
+    if (getKey("W") || getKey("ArrowUp")) { // W
         player.move('up', speed * delta);
+        player.moving = true;
     }
-    if (getKey("A")) { // A
+    if (getKey("A") || getKey("ArrowLeft")) { // A
         player.move('left', speed * delta);
         player.dir = 'left';
         player.texture.src = "assets/textures/RatLeft.png";
+        player.moving = true;
     }
-    if (getKey("S")) // S
+    if (getKey("S") || getKey("ArrowDown")) { // S
         player.move('down', speed * delta);
-    if (getKey("D")) { // D
+        player.moving = true;
+    }
+    if (getKey("D") || getKey("ArrowRight")) { // D
         player.move('right', speed * delta);
         player.dir = 'right';
         player.texture.src = "assets/textures/RatRight.png";
+        player.moving = true;
     }
-    moveCameraToPlayer();
+    if (!player.moving)
+        player.animation.frame = 1;
+    moveCameraToObject(player);
 }
 
 // Update Function:
