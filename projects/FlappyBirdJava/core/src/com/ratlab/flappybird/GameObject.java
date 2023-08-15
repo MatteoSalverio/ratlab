@@ -8,6 +8,7 @@ public class GameObject {
     public int width;
     public int height;
     public boolean movable;
+    public float rotation = 0f;
     public float velocityX, velocityY;
     public GameObject(int x, int y, int width, int height, boolean movable) {
         this.x = x;

@@ -9,7 +9,7 @@ import com.ratlab.flappybird.FlappyBird;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-		config.setForegroundFPS(144);
+		config.useVsync(true);
 		config.setTitle("Flappy Bird - Rat Lab");
 		config.setWindowedMode(GameVariables.screenWidth, GameVariables.screenHeight);
 		config.setWindowIcon(Files.FileType.Internal, "icon_128.png");
